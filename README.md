@@ -1,73 +1,127 @@
-# React + TypeScript + Vite
+# 🕹️ LateMate
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 지각하지 말자, 함께 — 실시간 위치 공유 기반 약속 관리 서비스
 
-Currently, two official plugins are available:
+약속을 생성하고 링크를 공유하면, 참여자들의 실시간 위치와 도착 예상 시간을 한눈에 확인할 수 있습니다. 회원가입 없이 링크 접속만으로 참여할 수 있습니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+<br />
 
-## React Compiler
+## 🎉 배포 링크
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+🔗 **[바로가기](https://latemates.vercel.app)**
 
-## Expanding the ESLint configuration
+> GPS 기능 사용을 위해 HTTPS 환경 필수. iOS Safari / Android Chrome 지원.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+<br />
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 💡 프로젝트 소개
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+"지금 어디야?", "언제 도착해?"라는 반복적인 문자 메시지를 없애기 위해 만든 서비스입니다.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+약속 생성 → 링크 공유 → 위치 공유 시작의 단순한 흐름으로, 모든 참여자가 서로의 위치와 도착 예상 시간을 실시간으로 확인할 수 있습니다. 시스템이 자동으로 지각 여부를 판단해 배지로 표시하며, 주요 행동은 타임라인으로 기록됩니다.
+
+### ✨ 기존 서비스와의 차이
+
+|                     | 카카오 라이브 위치 | 구글 맵 위치 공유 | LateMate |
+| ------------------- | ------------------ | ----------------- | -------- |
+| 약속 관리           | ✗                  | ✗                 | ✓        |
+| 지각 예상 자동 판단 | ✗                  | ✗                 | ✓        |
+| 회원가입 없이 참여  | ✓                  | ✗                 | ✓        |
+| 한국 지도 정확도    | ✓                  | △                 | ✓        |
+
+<br />
+
+## 🌟 주요 기능
+
+### 약속 생성 및 초대
+
+- 약속 제목, 장소(카카오 장소 검색), 시간을 입력해 약속 생성
+- 6자리 초대 코드 및 초대 링크 자동 발급
+- 코드 복사 한 번으로 카카오톡 등으로 공유
+- 회원가입 없이 링크 접속 → 닉네임 입력만으로 참여
+
+### 실시간 위치 공유
+
+- "위치 공유 시작" 버튼 클릭 시 GPS 추적 시작 (명시적 동의)
+- 7초 간격으로 참여자 위치 갱신 및 지도 마커 업데이트
+- 위치 변화 < 10m이고 10초 미경과 시 업로드 생략 (최적화)
+- 위치 공유 중지 가능, 권한 거부 시에도 다른 참여자 위치 조회 가능
+
+### ETA 자동 계산 및 지각 판단
+
+- Kakao Directions API로 30초마다 도착 예상 시간(ETA) 자동 계산
+- 예상 도착 시각 > 약속 시각 + 5분 → **지각 예상** 표시
+- 약속 장소 반경 100m 이내 진입 시 **도착** 자동 전환
+
+| 상태      | 색상 | 조건                     |
+| --------- | ---- | ------------------------ |
+| 정시 예상 | 초록 | ETA ≤ 약속 시각 + 5분    |
+| 지각 예상 | 빨강 | ETA > 약속 시각 + 5분    |
+| 도착      | 파랑 | 약속 장소 반경 100m 이내 |
+| 위치 없음 | 회색 | 위치 미공유              |
+
+### 지도
+
+- Kakao Maps 기반 실시간 마커 표시 (CustomOverlay)
+- 목적지 마커 + 참여자별 닉네임/상태 마커
+- 모든 참여자가 화면에 보이도록 자동 bounds 조정
+
+### 타임라인
+
+- 참여, 출발, 도착, 지각 예상 이벤트 자동 기록
+- 모든 참여자가 동일한 타임라인 공유 (10초 polling)
+
+### 세션 복구
+
+- `localStorage` 기반 세션 유지
+- 브라우저 종료 후 같은 링크 재접속 시 기존 세션 자동 복구
+
+<br />
+
+## 🔍 개발 환경
+
+| 역할            | 기술                          |
+| --------------- | ----------------------------- |
+| 빌드            | Vite 8                        |
+| UI              | React 19 + TypeScript 6       |
+| 스타일링        | TailwindCSS v4                |
+| 라우팅          | React Router v7               |
+| 서버 상태       | TanStack Query v5             |
+| 클라이언트 상태 | Zustand v5 (persist 미들웨어) |
+| 백엔드/DB       | Supabase (PostgreSQL + RLS)   |
+| 지도            | Kakao Maps JavaScript SDK v3  |
+| ETA 계산        | Kakao Mobility Directions API |
+| 장소 검색       | Kakao Local Search API        |
+| 아이콘          | Lucide React                  |
+| 배포            | Vercel                        |
+
+<br />
+
+## 🖥️ 프로젝트 구조
+
+```
+src/
+├── pages/          # 라우팅 진입점
+├── features/       # 도메인별 기능 컴포넌트
+│   ├── appointment/
+│   ├── map/
+│   ├── location/
+│   └── timeline/
+├── components/     # 순수 UI 컴포넌트
+├── hooks/          # 재사용 로직
+├── stores/         # Zustand 스토어
+├── lib/            # Supabase 클라이언트, API 함수
+├── types/          # 공유 타입
+├── constants/      # 상수
+└── utils/          # 유틸 함수
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+<br />
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠️ Out of Scope (MVP 제외 기능)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- 채팅, 소셜 피드, 친구 시스템
+- OAuth / 소셜 로그인
+- WebSocket 실시간 통신 (polling 방식으로 대체)
+- 푸시 알림, 백그라운드 위치 추적
+- 약속 수정/삭제, 히스토리 조회
