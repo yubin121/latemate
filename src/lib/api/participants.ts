@@ -55,7 +55,7 @@ export async function fetchParticipantsWithLocations(
       session_key: row.session_key as string,
       is_host: row.is_host as boolean,
       joined_at: row.joined_at as string,
-      location: Array.isArray(locations) ? (locations[0] ?? null) : null,
+      location: Array.isArray(locations) ? (locations[0] ?? null) : (locations ?? null),
     } as ParticipantWithLocation
   })
 }
