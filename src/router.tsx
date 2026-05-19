@@ -5,7 +5,7 @@ import SessionGuard from '@/components/layout/SessionGuard'
 import ErrorBoundary from '@/components/layout/ErrorBoundary'
 import Spinner from '@/components/ui/Spinner'
 
-const HomePage = lazy(() => import('@/pages/HomePage'))
+const LandingPage = lazy(() => import('@/pages/LandingPage'))
 const CreatePage = lazy(() => import('@/pages/CreatePage'))
 const JoinPage = lazy(() => import('@/pages/JoinPage'))
 const AppointmentPage = lazy(() => import('@/pages/AppointmentPage'))
@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
         path: '/',
         element: (
           <Suspense fallback={<PageFallback />}>
-            <HomePage />
+            <LandingPage />
           </Suspense>
         ),
       },
