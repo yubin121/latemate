@@ -1,0 +1,21 @@
+{
+  "name": "LateMate",
+  "short_name": "LateMate",
+  "description": "실시간 위치 공유 기반 지각 방지 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "icons": [
+    {
+      "src": "/latemate_app_icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/latemate_app_icon.png",
+      "sizes": "750x930",
+      "type": "image/png"
+    }
+  ]
+}
