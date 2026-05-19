@@ -107,7 +107,6 @@ export default function AppointmentPage() {
       {showInvite && (
         <InviteShare
           inviteCode={appointment.invite_code}
-          appointmentId={appointment.id}
           onClose={() => setShowInvite(false)}
         />
       )}

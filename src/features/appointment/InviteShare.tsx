@@ -5,17 +5,14 @@ import { cn } from '@/utils/cn'
 
 interface InviteShareProps {
   inviteCode: string
-  appointmentId: string
   onClose: () => void
 }
 
-export default function InviteShare({ inviteCode, appointmentId, onClose }: InviteShareProps) {
+export default function InviteShare({ inviteCode, onClose }: InviteShareProps) {
   const [copied, setCopied] = useState(false)
 
-  const shareUrl = `${window.location.origin}/join/${appointmentId}`
-
-  async function handleCopyLink() {
-    await navigator.clipboard.writeText(shareUrl)
+  async function handleCopyCode() {
+    await navigator.clipboard.writeText(inviteCode)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -46,7 +43,7 @@ export default function InviteShare({ inviteCode, appointmentId, onClose }: Invi
 
         {/* 복사 버튼 */}
         <button
-          onClick={handleCopyLink}
+          onClick={handleCopyCode}
           className={cn(
             'w-full h-12 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold transition-colors duration-150 mb-3',
             copied
@@ -62,7 +59,7 @@ export default function InviteShare({ inviteCode, appointmentId, onClose }: Invi
           ) : (
             <>
               <Copy size={16} strokeWidth={1.5} />
-              링크 복사
+              코드 복사
             </>
           )}
         </button>
