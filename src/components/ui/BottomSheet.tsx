@@ -66,7 +66,7 @@ export default function BottomSheet({ children, defaultSnap = 'half', className 
       ref={sheetRef}
       style={dragging ? { transform: `translateY(calc(${dragOffset}px))`, transition: 'none' } : undefined}
       className={cn(
-        'absolute inset-x-0 bottom-0 h-full rounded-t-3xl bg-surface-card shadow-sheet',
+        'absolute inset-x-0 bottom-0 h-full rounded-t-3xl bg-surface-card shadow-sheet z-10',
         'will-change-transform',
         !dragging && `transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${SNAP_PX[snap]}`,
         className,
