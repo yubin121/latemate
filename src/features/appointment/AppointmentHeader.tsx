@@ -9,7 +9,7 @@ interface AppointmentHeaderProps {
 
 type CountdownState =
   | { type: 'past' }
-  | { type: 'tomorrow'; timeStr: string }
+  | { type: 'future'; label: string; timeStr: string }
   | { type: 'countdown'; value: string }
 
 function getCountdownState(scheduledAt: string): CountdownState {
@@ -19,7 +19,11 @@ function getCountdownState(scheduledAt: string): CountdownState {
 
   if (diffMs <= 0) return { type: 'past' }
   if (diffMs > 24 * 60 * 60 * 1000) {
-    return { type: 'tomorrow', timeStr: formatHHMM(target) }
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const startOfTarget = new Date(target.getFullYear(), target.getMonth(), target.getDate())
+    const dayDiff = Math.round((startOfTarget.getTime() - startOfToday.getTime()) / (24 * 60 * 60 * 1000))
+    const label = dayDiff === 1 ? '내일' : `${dayDiff}일 후`
+    return { type: 'future', label, timeStr: formatHHMM(target) }
   }
   return { type: 'countdown', value: formatCountdown(target) }
 }
@@ -50,9 +54,9 @@ export default function AppointmentHeader({ appointment }: AppointmentHeaderProp
         {state.type === 'past' && (
           <span className="text-xs text-gray-400">약속 시간이 지났어요</span>
         )}
-        {state.type === 'tomorrow' && (
+        {state.type === 'future' && (
           <span className="text-xs font-semibold text-gray-500">
-            내일 {state.timeStr}
+            {state.label} {state.timeStr}
           </span>
         )}
         {state.type === 'countdown' && (
