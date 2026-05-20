@@ -73,7 +73,7 @@
 src/
 │
 ├── pages/                          # 라우팅 진입점 (thin layer)
-│   ├── HomePage.tsx
+│   ├── LandingPage.tsx
 │   ├── CreatePage.tsx
 │   ├── JoinPage.tsx
 │   └── AppointmentPage.tsx
@@ -202,18 +202,22 @@ AppointmentPage
 
 ## 4. 페이지 구조
 
-### HomePage (`/`)
+### LandingPage (`/`)
 
 ```
-역할: 서비스 진입점. 약속 만들기 또는 코드 입력으로 분기.
+역할: 서비스 랜딩 페이지. 약속 만들기 CTA + 코드 입력으로 분기.
 
 구성:
-  - 서비스 로고 + 슬로건
-  - [약속 만들기] 버튼 → /create 이동
-  - 초대 코드 입력 필드 + [참여하기] 버튼 → /join/:id 이동
+  - Hero: 로고 + 대형 타이포 + [약속 만들기] CTA + 초대 코드 입력
+  - Problem: 브랜드 파란 배경 + 채팅 화면 스마트폰 목업
+  - App Preview: 지도+참여자 화면 스마트폰 목업
+  - Features: 핵심 기능 3개 카드 (scroll fade-up)
+  - How it works: 3단계 스텝
+  - Bottom CTA: 최종 약속 만들기 버튼
+  - Sticky CTA: 스크롤 500px 이후 나타나는 고정 버튼 (Bottom CTA 진입 시 자동 숨김)
 
-상태: 로컬 코드 입력값만 관리 (useState)
-데이터 페칭: 없음
+상태: 로컬 코드 입력값, stickyBar 노출 여부 (useState/IntersectionObserver)
+데이터 페칭: fetchAppointmentByCode (코드 참여 시)
 ```
 
 ### CreatePage (`/create`)
@@ -289,7 +293,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage />,
+    element: <LandingPage />,
   },
   {
     path: '/create',
@@ -1381,7 +1385,7 @@ npm install lucide-react
 | `Users` | 참여자 목록 |
 | `CheckCircle2` | 도착 완료 |
 | `AlertCircle` | 지각 예상 경고 |
-| `Copy` | 초대 링크 복사 |
+| `Copy` | 초대 코드 복사 |
 | `Share2` | 공유 버튼 |
 | `ChevronUp` | BottomSheet 핸들 |
 
@@ -1474,6 +1478,30 @@ transitionDuration: {
 }
 ```
 
+**⑥ Float — 랜딩페이지 스마트폰 목업 부유 효과**
+
+```css
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+.animate-float      { animation: float 3s ease-in-out infinite; }
+.animate-float-slow { animation: float 4.5s ease-in-out infinite; }
+```
+
+**⑦ Fade Up — 랜딩페이지 스크롤 진입 애니메이션**
+
+```tsx
+// IntersectionObserver로 뷰포트 진입 감지 후 opacity + translateY 전환
+// 각 섹션 콘텐츠가 스크롤로 뷰에 들어올 때 아래→위로 자연스럽게 등장
+// FadeUp 컴포넌트: delay prop으로 stagger 구현 (feature 카드: 100ms 간격)
+style={{
+  opacity: inView ? 1 : 0,
+  transform: inView ? 'translateY(0)' : 'translateY(32px)',
+  transition: `opacity 0.7s ease-out ${delay}ms, transform 0.7s ease-out ${delay}ms`,
+}}
+```
+
 #### 컴포넌트별 트랜지션
 
 | 컴포넌트 | 트랜지션 |
@@ -1489,32 +1517,50 @@ transitionDuration: {
 
 ### 15.8 페이지별 UI 명세
 
-#### HomePage (`/`)
+#### LandingPage (`/`)
 
 ```
 ┌──────────────────────────────┐
-│                              │  bg: #F7F8FC
+│  LM  LateMate                │  bg: white, 로고 + 브랜드명
 │                              │
-│   ╔════════════════════╗     │
-│   ║  LM  LateMate      ║     │  로고: 인디고 아이콘 + Pretendard Bold
-│   ╚════════════════════╝     │
+│  지각하지                    │  text-[52px] font-black text-gray-900
+│  말자,                       │
+│  함께 (brand-600)            │  핵심 키워드에 브랜드 컬러 강조
 │                              │
-│   지각 걱정 없는              │  text-2xl font-bold text-gray-900
-│   약속 공유                   │
+│  실시간 위치 공유로 ...       │  text-[15px] text-gray-500
 │                              │
-│   실시간 위치로 서로의         │  text-sm text-gray-500
-│   도착을 확인하세요            │
-│                              │
-│   ┌──────────────────────┐   │
-│   │  + 약속 만들기        │   │  Primary 버튼 h-14, rounded-2xl
-│   └──────────────────────┘   │  bg-indigo-600 text-white, full width
-│                              │
-│   ── 또는 코드로 참여 ──      │  text-xs text-gray-400, divider line
-│                              │
-│   ┌──────────────────────┐   │
-│   │  초대 코드 6자리       │   │  Input h-12, text-center text-lg
-│   └──────────────────────┘   │  font-mono letter-spacing-widest
-│                              │
+│  ┌──────────────────────┐   │
+│  │  약속 만들기  →       │   │  h-14, rounded-2xl, bg-brand-600
+│  └──────────────────────┘   │
+│  ── 또는 코드로 참여 ──      │
+│  ┌──────────────┐ ┌──────┐  │
+│  │ 초대 코드 6자리│ │참여  │  │
+│  └──────────────┘ └──────┘  │
+│         [SCROLL ↓]           │  마우스 아이콘 + bounce 힌트
+├──────────────────────────────┤
+│  (brand-600 bg)              │  Problem 섹션
+│  "지금 어디야?" ...           │
+│      📱 채팅 스마트폰 목업    │  float 애니메이션
+├──────────────────────────────┤
+│  (white bg)                  │  App Preview 섹션
+│  실시간 지도로 한눈에         │
+│      📱 지도 스마트폰 목업    │  float-slow 애니메이션
+├──────────────────────────────┤
+│  (gray-50 bg) 핵심 기능      │  Features 섹션, stagger fade-up
+│  ┌──────┐ ┌──────┐ ┌──────┐│
+│  │위치공유│ │ETA  │ │지각알림│  3개 카드
+│  └──────┘ └──────┘ └──────┘│
+├──────────────────────────────┤
+│  3단계로 끝                   │  How it works 섹션
+│  01 → 02 → 03               │  그라데이션 연결선
+├──────────────────────────────┤
+│  (brand gradient bg)         │  Bottom CTA 섹션
+│  30초면 충분해요              │
+│  ┌──────────────────────┐   │
+│  │  약속 만들기  →       │   │
+│  └──────────────────────┘   │
+└──────────────────────────────┘
+[fixed bottom] 약속 만들기 →    스크롤 500px 후 등장, Bottom CTA 진입 시 숨김
 │   ┌──────────────────────┐   │
 │   │  참여하기             │   │  Secondary 버튼 h-12
 │   └──────────────────────┘   │  bg-gray-100 text-gray-900
@@ -1809,7 +1855,7 @@ const BADGE_CONFIG = {
 │  └──────────────────────────────┘   │
 │                                      │
 │  ┌──────────────┐ ┌──────────────┐  │
-│  │ 📋 링크 복사  │ │ 💬 카톡 공유  │  │  버튼 2개 나란히
+│  │ 📋 코드 복사  │ │ 💬 카톡 공유  │  │  버튼 2개 나란히
 │  └──────────────┘ └──────────────┘  │
 │                                      │
 │  ┌──────────────────────────────┐   │
@@ -1845,8 +1891,8 @@ const BADGE_CONFIG = {
 #### 초대 코드 복사
 
 ```
-1. 사용자가 "링크 복사" 클릭
-2. 버튼 텍스트: "📋 링크 복사" → "✅ 복사됐어요!"
+1. 사용자가 "코드 복사" 클릭
+2. 버튼 텍스트: "📋 코드 복사" → "✅ 복사됐어요!"
 3. 버튼 색상: gray-100 → emerald-50 (transition 150ms)
 4. 2초 후 원래 상태 복원
 ```
@@ -1855,7 +1901,7 @@ const BADGE_CONFIG = {
 const [copied, setCopied] = useState(false)
 
 const handleCopy = async () => {
-  await navigator.clipboard.writeText(inviteUrl)
+  await navigator.clipboard.writeText(inviteCode)  // URL이 아닌 6자리 코드 복사
   setCopied(true)
   setTimeout(() => setCopied(false), 2000)
 }

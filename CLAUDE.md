@@ -89,7 +89,7 @@ npm run lint
 ```
 src/
 ├── pages/                  # 라우팅 진입점 (thin layer, 데이터 페칭 훅 호출만)
-│   ├── HomePage.tsx
+│   ├── LandingPage.tsx
 │   ├── CreatePage.tsx
 │   ├── JoinPage.tsx
 │   └── AppointmentPage.tsx
@@ -248,13 +248,14 @@ VITE_KAKAO_REST_API_KEY=    # Kakao REST API 키 (Directions, Local Search)
 | 항목 | 상태 |
 |------|------|
 | 문서 작성 (PRD, DESIGN, TASK) | ✅ 완료 |
-| 프로젝트 세팅 (Phase 1) | ⬜ 미시작 |
-| 라우팅 및 레이아웃 (Phase 2) | ⬜ 미시작 |
-| Supabase 세팅 (Phase 3) | ⬜ 미시작 |
-| 약속 기능 (Phase 4) | ⬜ 미시작 |
-| 지도 기능 (Phase 5) | ⬜ 미시작 |
-| 실시간 위치 공유 (Phase 6) | ⬜ 미시작 |
-| 지각 판단 기능 (Phase 7) | ⬜ 미시작 |
-| 타임라인 기능 (Phase 8) | ⬜ 미시작 |
-| UI/UX 개선 (Phase 9) | ⬜ 미시작 |
-| 리팩토링 및 최적화 (Phase 10) | ⬜ 미시작 |
+| 프로젝트 세팅 (Phase 1) | ✅ 완료 |
+| 라우팅 및 레이아웃 (Phase 2) | ✅ 완료 |
+| Supabase 세팅 (Phase 3) | ✅ 완료 |
+| 약속 기능 (Phase 4) | ✅ 완료 |
+| 지도 기능 (Phase 5) | ✅ 완료 |
+| 실시간 위치 공유 (Phase 6) | ✅ 완료 |
+| 지각 판단 기능 (Phase 7) | ✅ 완료 |
+| 타임라인 기능 (Phase 8) | ✅ 완료 |
+| UI/UX 개선 (Phase 9) | ✅ 완료 |
+| 리팩토링 및 최적화 (Phase 10) | ✅ 완료 |
+| 배포 후 개선 (Phase 11) | ✅ 완료 |
