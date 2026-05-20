@@ -49,7 +49,8 @@
 | Phase 8 — 타임라인 기능       | 4개      | 1일       |
 | Phase 9 — UI/UX 개선          | 7개      | 1.5일     |
 | Phase 10 — 리팩토링 및 최적화 | 5개      | 1일       |
-| **합계**                      | **60개** | **~13일** |
+| Phase 11 — 배포 후 개선       | 9개      | 추가 작업 |
+| **합계**                      | **69개** | **~13일** |
 
 ---
 
@@ -1689,6 +1690,142 @@ T-005 → T-013 → T-014 → T-018 → T-022 → T-023
                                               ↓
                                        T-044 → T-045 → T-046
 ```
+
+---
+
+## Phase 11 — 배포 후 개선
+
+> 목표: 배포 후 발견된 버그 수정 + 랜딩페이지 신규 구현 + 메타 설정.
+
+---
+
+### T-061 · BottomSheet z-index 버그 수정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P0
+- **선행 작업**: T-011, T-027
+
+**작업 설명**  
+Kakao Maps SDK가 내부적으로 높은 z-index를 적용해 BottomSheet가 지도 뒤에 숨는 버그를 수정한다.
+
+**수정 내용**: `BottomSheet.tsx`의 시트 컨테이너에 `z-10` 추가.
+
+---
+
+### T-062 · 날짜 표시 버그 수정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-051
+
+**작업 설명**  
+약속 날짜가 며칠 후든 항상 "내일"로 표시되던 버그를 수정한다.
+
+**원인**: `diffMs > 24h` 조건이 모든 미래 날짜를 포함해 하루 초과도 "내일"로 처리.  
+**수정 내용**: `AppointmentHeader.tsx`에서 달력 날짜 기준 diff 계산으로 변경. dayDiff === 1일 때만 "내일", 그 외 "N일 후" 표시.
+
+---
+
+### T-063 · 위치 마커 미표시 버그 수정 [x]
+
+- **난이도**: 🟡 Medium
+- **우선순위**: P0
+- **선행 작업**: T-018, T-029
+
+**작업 설명**  
+위치 공유를 켜도 지도에 마커가 표시되지 않던 버그를 수정한다.
+
+**원인**: PostgREST v12+에서 FK=PK 1:1 관계(`participant_locations`)를 배열이 아닌 객체로 반환. 기존 코드가 배열을 가정해 `location: null`로 처리.  
+**수정 내용**: `lib/api/participants.ts`에서 `Array.isArray()` 분기 추가.
+
+---
+
+### T-064 · 코드 복사 버그 수정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-023
+
+**작업 설명**  
+"코드 복사" 버튼 클릭 시 코드 대신 URL이 복사되던 버그를 수정한다.
+
+**수정 내용**: `InviteShare.tsx`의 복사 함수를 `inviteUrl` → `inviteCode` 복사로 변경, 버튼 레이블 "링크 복사" → "코드 복사"로 수정, `appointmentId` prop 제거.
+
+---
+
+### T-065 · Favicon / PWA manifest / OpenGraph 메타태그 설정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-001
+
+**작업 설명**  
+배포 후 링크 공유 시 프리뷰와 앱 설치 경험을 개선한다.
+
+**수정 내용**:
+- `index.html`: `<link rel="icon">` (SVG favicon), `<link rel="apple-touch-icon">`, `<link rel="manifest">`, OG/Twitter 카드 메타태그 추가
+- `public/manifest.json`: PWA manifest 생성 (name, icons, display: standalone)
+
+---
+
+### T-066 · README.md 작성 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: Phase 1~10 완료
+
+**작업 설명**  
+GitHub 공개를 위한 README.md를 작성한다.
+
+**포함 내용**: 배포 링크, 프로젝트 소개, 기존 서비스와의 차이, 주요 기능, 개발 환경(기술 스택), 프로젝트 구조, Out of Scope.
+
+---
+
+### T-067 · LandingPage 신규 구현 (HomePage 대체) [x]
+
+- **난이도**: 🟡 Medium
+- **우선순위**: P1
+- **선행 작업**: T-019
+
+**작업 설명**  
+기존 단순 코드 입력 중심의 `HomePage`를 서비스 소개 기능이 포함된 `LandingPage`로 교체한다.
+
+**수정 내용**:
+- `src/pages/LandingPage.tsx` 신규 생성
+- `src/router.tsx`의 `/` 라우트를 `HomePage` → `LandingPage`로 교체
+- Hero / Problem / Features / How it works / Bottom CTA 5개 섹션 구성
+
+---
+
+### T-068 · LandingPage 리디자인 — 스마트폰 목업 + 스크롤 애니메이션 [x]
+
+- **난이도**: 🔴 Hard
+- **우선순위**: P2
+- **선행 작업**: T-067
+
+**작업 설명**  
+참고 서비스(ittaeok.com) 스타일을 참고해 랜딩페이지를 전면 리디자인한다.
+
+**수정 내용**:
+- `PhoneFrame` 컴포넌트: CSS로 구현한 iPhone Dynamic Island 스마트폰 프레임
+- `ChatScreen` / `MapScreen`: 폰 목업 내부에 표시되는 앱 화면 시뮬레이션 (실제 스크린샷 없이 HTML/CSS로 구현)
+- `FadeUp` 컴포넌트: `IntersectionObserver` 기반 스크롤 진입 fade-up 애니메이션
+- `animate-float` / `animate-float-slow`: CSS keyframes로 목업 부유 효과
+- Sticky 하단 CTA: 스크롤 500px 후 등장, `IntersectionObserver`로 Bottom CTA 섹션 진입 시 자동 숨김
+
+---
+
+### T-069 · Sticky CTA 버튼 중복 표시 버그 수정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-068
+
+**작업 설명**  
+하단 CTA 섹션까지 스크롤 시 Sticky 버튼과 섹션 내 버튼이 겹쳐 보이던 버그를 수정한다.
+
+**원인**: scroll 이벤트 핸들러가 `window.scrollY > 500`이면 무조건 `true`로 덮어써서 `IntersectionObserver`의 숨김 결과를 무효화.  
+**수정 내용**: `bottomCtaInView` ref를 추가해 scroll 핸들러와 IntersectionObserver가 공유. scroll 핸들러는 `!bottomCtaInView.current`도 함께 체크.
 
 ---
 
