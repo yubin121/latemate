@@ -12,9 +12,16 @@ interface SelectedPlace {
   lng: number
 }
 
-function toLocalDatetimeValue(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+function pad(n: number) {
+  return String(n).padStart(2, '0')
+}
+
+function toLocalDateValue(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+function toLocalTimeValue(date: Date): string {
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 export default function CreatePage() {
@@ -23,11 +30,15 @@ export default function CreatePage() {
 
   const [title, setTitle] = useState('')
   const [place, setPlace] = useState<SelectedPlace | null>(null)
-  const [scheduledAt, setScheduledAt] = useState('')
+  const [scheduledDate, setScheduledDate] = useState('')
+  const [scheduledTime, setScheduledTime] = useState('')
   const [hostNickname, setHostNickname] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const minDatetime = toLocalDatetimeValue(new Date())
+  const now = new Date()
+  const todayStr = toLocalDateValue(now)
+  const minTime = scheduledDate === todayStr ? toLocalTimeValue(now) : ''
+  const scheduledAt = scheduledDate && scheduledTime ? `${scheduledDate}T${scheduledTime}` : ''
 
   function validate() {
     const e: Record<string, string> = {}
@@ -106,18 +117,32 @@ export default function CreatePage() {
           <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
             약속 날짜 & 시간
           </label>
-          <input
-            type="datetime-local"
-            value={scheduledAt}
-            min={minDatetime}
-            onChange={(e) => setScheduledAt(e.target.value)}
-            className={cn(
-              'h-12 px-4 w-full min-w-0 max-w-full rounded-2xl border bg-gray-50 text-base outline-none transition-colors',
-              'border-gray-200',
-              'focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:bg-white',
-              errors.scheduledAt && 'border-status-late',
-            )}
-          />
+          <div className="flex gap-2">
+            <input
+              type="date"
+              value={scheduledDate}
+              min={todayStr}
+              onChange={(e) => setScheduledDate(e.target.value)}
+              className={cn(
+                'h-12 px-3 flex-1 min-w-0 rounded-2xl border bg-gray-50 text-base outline-none transition-colors',
+                'border-gray-200',
+                'focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:bg-white',
+                errors.scheduledAt && 'border-status-late',
+              )}
+            />
+            <input
+              type="time"
+              value={scheduledTime}
+              min={minTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+              className={cn(
+                'h-12 px-3 w-28 min-w-0 rounded-2xl border bg-gray-50 text-base outline-none transition-colors',
+                'border-gray-200',
+                'focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:bg-white',
+                errors.scheduledAt && 'border-status-late',
+              )}
+            />
+          </div>
           {errors.scheduledAt && (
             <p className="mt-1.5 text-xs text-status-late">{errors.scheduledAt}</p>
           )}
