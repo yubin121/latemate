@@ -3,6 +3,7 @@ import { fetchAppointmentByCode } from '@/lib/api/appointments';
 import {
   AlertCircle,
   ArrowRight,
+  ChevronDown,
   Clock,
   MapPin,
   Navigation,
@@ -427,14 +428,7 @@ export default function LandingPage() {
 
         {/* Scroll hint */}
         <div className='relative z-10 flex justify-center'>
-          <div className='flex flex-col items-center gap-1.5 opacity-35'>
-            <div className='w-5 h-8 border-2 border-gray-400 rounded-full flex items-start justify-center pt-1.5'>
-              <div className='w-1 h-2 bg-gray-400 rounded-full animate-bounce' />
-            </div>
-            <p className='text-[9px] text-gray-400 tracking-[0.2em] font-medium'>
-              SCROLL
-            </p>
-          </div>
+          <ChevronDown size={24} strokeWidth={1.5} className='text-gray-400 opacity-35 animate-bounce' />
         </div>
       </section>
 
