@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MapPin, Link } from 'lucide-react'
+import { MapPin, Link, House } from 'lucide-react'
 import { formatCountdown, formatHHMM } from '@/utils/formatTime'
 import type { Appointment } from '@/types'
 
@@ -7,6 +7,7 @@ interface AppointmentHeaderProps {
   appointment: Appointment
   isHost?: boolean
   onShowInvite?: () => void
+  onBack?: () => void
 }
 
 type CountdownState =
@@ -30,7 +31,7 @@ function getCountdownState(scheduledAt: string): CountdownState {
   return { type: 'countdown', value: formatCountdown(target) }
 }
 
-export default function AppointmentHeader({ appointment, isHost, onShowInvite }: AppointmentHeaderProps) {
+export default function AppointmentHeader({ appointment, isHost, onShowInvite, onBack }: AppointmentHeaderProps) {
   const [state, setState] = useState<CountdownState>(() =>
     getCountdownState(appointment.scheduled_at),
   )
@@ -44,6 +45,16 @@ export default function AppointmentHeader({ appointment, isHost, onShowInvite }:
 
   return (
     <header className="flex items-center h-14 px-4 bg-white border-b border-gray-100 flex-shrink-0">
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-700 flex-shrink-0 -ml-2 mr-1"
+          aria-label="메인으로 돌아가기"
+        >
+          <House size={18} strokeWidth={1.5} />
+        </button>
+      )}
+
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-gray-900 truncate">{appointment.title}</p>
         <div className="flex items-center gap-1 mt-0.5">

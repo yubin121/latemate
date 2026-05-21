@@ -5,12 +5,16 @@ import { useParticipants } from '@/hooks/useParticipants'
 import { useTimeline } from '@/hooks/useTimeline'
 import { useEta } from '@/hooks/useEta'
 import { useSessionStore } from '@/stores/sessionStore'
+import { useLocationStore } from '@/stores/locationStore'
+import { useGeolocation } from '@/hooks/useGeolocation'
+import { stopSharingLocation } from '@/lib/api/locations'
 import AppointmentHeader from '@/features/appointment/AppointmentHeader'
 import AppointmentMap from '@/features/map/AppointmentMap'
 import ParticipantList from '@/features/appointment/ParticipantList'
 import Timeline from '@/features/timeline/Timeline'
 import LocationControl from '@/features/location/LocationControl'
 import InviteShare from '@/features/appointment/InviteShare'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 import BottomSheet from '@/components/ui/BottomSheet'
 import Spinner from '@/components/ui/Spinner'
 import { ParticipantListSkeleton, TimelineSkeletonList } from '@/components/ui/Skeleton'
@@ -47,10 +51,14 @@ export default function AppointmentPage() {
   const { data: participants = [], isLoading: participantsLoading } = useParticipants(appointmentId!)
   const { data: timelineEvents = [], isLoading: timelineLoading } = useTimeline(appointmentId!)
 
+  const isSharing = useLocationStore((s) => s.isSharing)
+  const { stopSharing } = useGeolocation({ participantId: session?.participantId ?? '' })
+
   const isNewlyCreated =
     (location.state as { newlyCreated?: boolean } | null)?.newlyCreated === true
   const [showInvite, setShowInvite] = useState(() => isNewlyCreated)
   const [inviteOpenedByHost, setInviteOpenedByHost] = useState(false)
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
 
   // history state의 newlyCreated를 즉시 제거 — 새로고침 시 모달 재등장 방지
   useEffect(() => {
@@ -58,6 +66,22 @@ export default function AppointmentPage() {
       navigate('.', { replace: true, state: null })
     }
   }, [])
+
+  function handleBack() {
+    if (isSharing) {
+      setShowLeaveConfirm(true)
+    } else {
+      navigate('/')
+    }
+  }
+
+  async function handleLeaveConfirm() {
+    stopSharing()
+    if (session?.participantId) {
+      stopSharingLocation(session.participantId).catch(() => {})
+    }
+    navigate('/')
+  }
 
   if (isLoading || !appointment) {
     return (
@@ -73,6 +97,7 @@ export default function AppointmentPage() {
         appointment={appointment}
         isHost={session?.isHost}
         onShowInvite={() => { setInviteOpenedByHost(true); setShowInvite(true) }}
+        onBack={handleBack}
       />
 
       {session && (
@@ -122,6 +147,18 @@ export default function AppointmentPage() {
           inviteCode={appointment.invite_code}
           onClose={() => { setShowInvite(false); setInviteOpenedByHost(false) }}
           title={inviteOpenedByHost ? '초대 코드 공유' : '약속이 만들어졌어요! 🎉'}
+        />
+      )}
+
+      {showLeaveConfirm && (
+        <ConfirmModal
+          title="약속 화면을 나가시겠어요?"
+          description="위치 공유가 중단되고 다른 참여자에게 내 위치가 더 이상 보이지 않아요."
+          confirmLabel="나가기"
+          cancelLabel="계속 공유하기"
+          variant="danger"
+          onConfirm={handleLeaveConfirm}
+          onCancel={() => setShowLeaveConfirm(false)}
         />
       )}
     </div>
