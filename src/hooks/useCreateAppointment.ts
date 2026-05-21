@@ -7,6 +7,8 @@ import { useSessionStore } from '@/stores/sessionStore'
 import { useToast } from '@/hooks/useToast'
 import type { CreateAppointmentInput } from '@/types'
 
+const SESSION_KEY_STORAGE = 'latemate_session_key'
+
 export function useCreateAppointment() {
   const navigate = useNavigate()
   const setSession = useSessionStore((s) => s.setSession)
@@ -16,7 +18,9 @@ export function useCreateAppointment() {
     mutationFn: async (input: CreateAppointmentInput & { hostNickname: string }) => {
       const { hostNickname, ...appointmentInput } = input
       const appointment = await createAppointment(appointmentInput)
-      const sessionKey = crypto.randomUUID()
+      const existing = localStorage.getItem(SESSION_KEY_STORAGE)
+      const sessionKey = existing ?? crypto.randomUUID()
+      if (!existing) localStorage.setItem(SESSION_KEY_STORAGE, sessionKey)
       const participant = await createHostParticipant(appointment.id, hostNickname, sessionKey)
       await insertTimelineEvent(appointment.id, 'JOINED', participant.id)
       return { appointment, participant, sessionKey }
