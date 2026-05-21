@@ -144,7 +144,8 @@ src/
 ├── utils/
 │   ├── formatTime.ts               # 시각 포맷 유틸
 │   ├── distance.ts                 # 좌표 간 거리 계산 (Haversine)
-│   └── cn.ts                       # clsx + tailwind-merge 래퍼
+│   ├── cn.ts                       # clsx + tailwind-merge 래퍼
+│   └── korean.ts                   # 한국어 조사 유틸 (이/가 등)
 │
 └── main.tsx
 ```
@@ -161,8 +162,9 @@ AppointmentPage
 │   │
 │   ├── AppointmentHeader
 │   │   ├── 약속 제목
-│   │   ├── 약속 시간 카운트다운
-│   │   └── 약속 장소명
+│   │   ├── 약속 장소명
+│   │   ├── [Link 아이콘 버튼] ← 주최자(isHost)에게만 표시. 탭 시 InviteShare 모달 오픈
+│   │   └── 약속 시간 카운트다운
 │   │
 │   ├── AppointmentMap              ← 지도 (화면 상단 50%)
 │   │   ├── DestinationMarker       ← 목적지 핀
@@ -806,17 +808,42 @@ export default function Avatar({ nickname, size = 'md' }: AvatarProps) {
 ```tsx
 // components/ui/BottomSheet.tsx
 // 모바일 전용. 드래그로 높이 조절 가능한 하단 패널.
-// 핸들 영역 터치 → translateY 조정
 // 상태: 'collapsed' | 'half' | 'full'
 
 interface BottomSheetProps {
   children: React.ReactNode
   defaultSnap?: 'collapsed' | 'half' | 'full'
 }
-
-// 구현: CSS transform + touch event 조합
-// overscroll-behavior: contain 으로 스크롤 버블 방지
 ```
+
+**구현 전략** (픽셀 기반 DOM 직접 조작):
+
+```
+스냅 위치 (컨테이너 높이 h 기준):
+  collapsed → h - 72   (핸들 72px만 노출)
+  half      → h * 0.5  (화면 절반)
+  full      → h * 0.1  (거의 전체)
+
+pointerDown:
+  getComputedStyle(el).transform → DOMMatrix.m42 로 현재 시각적 Y 읽기
+  진행 중인 transition 그 자리에서 중단 (점프 방지)
+  transition: 'none' 설정
+
+pointerMove:
+  y = startSheetY + (clientY - startPtrY)
+  경계 초과 시 러버밴드: y = boundary + (overflow) * 0.3
+  sheetRef.current.style.transform 직접 조작 (리렌더 없음)
+  velocity 측정: (Δclient Y) / (Δtimeestamp) px/ms
+
+pointerUp:
+  |velocity| > 0.4 px/ms → 플릭 방향으로 한 단계 이동
+  그 외 → 현재 Y에서 가장 가까운 스냅 포인트 흡착
+  transition: 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)' 복원
+```
+
+모든 드래그 상태(`currentY`, `velocity`, `startSheetY` 등)를 `useRef`로 관리해 `setState` 없이 60fps 유지.  
+초기 위치 설정은 `useLayoutEffect`로 페인트 전 적용해 첫 프레임 플래시 방지.  
+`overscroll-behavior: contain`으로 내부 스크롤이 페이지로 전파되지 않도록 처리.
 
 ---
 
@@ -1508,7 +1535,7 @@ style={{
 |---------|---------|
 | Button hover/active | `transition-colors duration-150` |
 | StatusBadge 상태 변경 | `transition-all duration-300` |
-| BottomSheet 드래그 | `transition-transform duration-250 ease-spring` |
+| BottomSheet 드래그 | `transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)` (스냅 착지 시만, 드래그 중 transition: none) |
 | 마커 위치 이동 | Kakao Maps 내 `setPosition()` — CSS transition 별도 적용 불가 |
 | ParticipantCard 진입 | `animate-slide-up` (리스트에 새 항목 추가 시) |
 | 토스트 | fade-in `opacity-0 → opacity-100 duration-200` |
@@ -1929,14 +1956,16 @@ const handleCopy = async () => {
 #### BottomSheet 드래그
 
 ```
-snap points: [72px | 50vh | 90vh]
+snap points (컨테이너 높이 h 기준 픽셀값):
   │
-  ├─ collapsed (72px): LocationControl 버튼만 노출
-  ├─ half (50vh):      참여자 목록 상단까지 노출 (기본)
-  └─ full (90vh):      전체 목록 + 타임라인
+  ├─ collapsed (h - 72px): 핸들 + LocationControl 버튼만 노출
+  ├─ half (h * 0.5):       참여자 목록 상단까지 노출 (기본)
+  └─ full (h * 0.1):       전체 목록 + 타임라인
 
 드래그 중: map 영역에 dim overlay 없음 (투명)
-스냅 시:   spring 이징으로 착지감
+경계 초과: 러버밴드 저항 0.3 감쇠 (고무줄 효과)
+스냅 결정: 플릭 속도 0.4px/ms 초과 시 방향으로 한 단계, 미만 시 가장 가까운 스냅 흡착
+스냅 이징: cubic-bezier(0.32, 0.72, 0, 1) — iOS 스타일, 튕김 없이 빠르게 착지
 ```
 
 #### 참여자 신규 입장
