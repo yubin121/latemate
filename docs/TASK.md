@@ -49,8 +49,8 @@
 | Phase 8 — 타임라인 기능       | 4개      | 1일       |
 | Phase 9 — UI/UX 개선          | 7개      | 1.5일     |
 | Phase 10 — 리팩토링 및 최적화 | 5개      | 1일       |
-| Phase 11 — 배포 후 개선       | 16개     | 추가 작업 |
-| **합계**                      | **76개** | **~13일** |
+| Phase 11 — 배포 후 개선       | 18개     | 추가 작업 |
+| **합계**                      | **78개** | **~13일** |
 
 ---
 
@@ -1967,6 +1967,63 @@ pointerUp   → velocity(px/ms) 기반 플릭 감지 → 목표 스냅 결정 �
 **수정 내용**:
 - `src/stores/locationStore.ts`: `persist` 미들웨어 추가. `isSharing`만 localStorage 저장 (`partialize`로 `watchId`·`coords` 등 런타임 값 제외)
 - `src/features/location/LocationControl.tsx`: 마운트 시 `isSharing === true`이면 `startSharing()` 자동 호출로 GPS 재연결
+
+---
+
+### T-077 · ConfirmModal 컴포넌트 구현 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-009
+
+**작업 설명**  
+디자인 시스템에 맞는 재사용 가능한 확인 모달 컴포넌트를 구현한다.
+
+**수정 내용** (`src/components/ui/ConfirmModal.tsx` 신규):
+- `InviteShare`와 동일한 바텀시트 스타일 (오버레이 + 흰 카드 + slide-up 애니메이션)
+- 상단 핸들 바, 제목, 선택적 설명, 확인/취소 버튼 2개
+- `variant: 'danger' | 'primary'`로 확인 버튼 색상 분기 (danger: 빨간색)
+- 오버레이 탭 시 `onCancel` 호출 (바깥 탭으로 닫기)
+
+---
+
+### T-078 · 약속 페이지 메인으로 돌아가기 버튼 추가 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-030, T-077
+
+**작업 설명**  
+약속 페이지에서 메인(랜딩) 페이지로 돌아가는 버튼을 헤더 좌측에 추가한다.
+
+**동작**:
+- 위치 공유 중 아닐 때: 즉시 `/`로 이동
+- 위치 공유 중일 때: ConfirmModal 표시 → "나가기" 선택 시 `stopSharing()` + Supabase `is_sharing: false` 업데이트 후 이동 (참여자 레코드는 유지)
+
+**수정 내용**:
+- `AppointmentHeader.tsx`: `onBack` prop 추가, 좌측 `House` 아이콘 버튼 추가
+- `AppointmentPage.tsx`: `handleBack`, `handleLeaveConfirm` 핸들러 구현, `showLeaveConfirm` state, `ConfirmModal` 렌더링
+
+---
+
+---
+
+### T-079 · 주최자 세션 키 localStorage 미저장 버그 수정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-030
+
+**작업 설명**  
+`useCreateAppointment`에서 `crypto.randomUUID()`로 생성한 sessionKey를 localStorage에 저장하지 않아, 주최자가 홈으로 나갔다가 초대 코드로 재진입 시 JoinPage 세션 복구가 실패하고 닉네임 입력 폼이 노출되는 버그를 수정한다.
+
+**파생 문제**:
+- 주최자가 기존 닉네임으로 재참여 시도 → "이미 사용 중인 닉네임" 에러
+- 주최자가 다른 닉네임으로 재참여 → 중복 참여자 레코드 생성 + 타임라인 이벤트 중복 기록
+
+**수정 내용** (`src/hooks/useCreateAppointment.ts`):
+- `crypto.randomUUID()` 직접 사용 → `localStorage.getItem('latemate_session_key')` 기존 키 재사용 패턴으로 교체
+- 키가 없을 때만 `crypto.randomUUID()`로 생성 후 localStorage에 저장
 
 ---
 
