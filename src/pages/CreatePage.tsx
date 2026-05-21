@@ -112,7 +112,7 @@ export default function CreatePage() {
             min={minDatetime}
             onChange={(e) => setScheduledAt(e.target.value)}
             className={cn(
-              'h-12 px-4 w-full rounded-2xl border bg-gray-50 text-base outline-none transition-colors',
+              'h-12 px-4 w-full min-w-0 max-w-full rounded-2xl border bg-gray-50 text-base outline-none transition-colors',
               'border-gray-200',
               'focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:bg-white',
               errors.scheduledAt && 'border-status-late',
