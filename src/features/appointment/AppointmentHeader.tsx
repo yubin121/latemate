@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { MapPin } from 'lucide-react'
+import { MapPin, Link } from 'lucide-react'
 import { formatCountdown, formatHHMM } from '@/utils/formatTime'
 import type { Appointment } from '@/types'
 
 interface AppointmentHeaderProps {
   appointment: Appointment
+  isHost?: boolean
+  onShowInvite?: () => void
 }
 
 type CountdownState =
@@ -28,7 +30,7 @@ function getCountdownState(scheduledAt: string): CountdownState {
   return { type: 'countdown', value: formatCountdown(target) }
 }
 
-export default function AppointmentHeader({ appointment }: AppointmentHeaderProps) {
+export default function AppointmentHeader({ appointment, isHost, onShowInvite }: AppointmentHeaderProps) {
   const [state, setState] = useState<CountdownState>(() =>
     getCountdownState(appointment.scheduled_at),
   )
@@ -50,7 +52,17 @@ export default function AppointmentHeader({ appointment }: AppointmentHeaderProp
         </div>
       </div>
 
-      <div className="flex-shrink-0 ml-3 text-right">
+      {isHost && onShowInvite && (
+        <button
+          onClick={onShowInvite}
+          className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-brand-600 flex-shrink-0"
+          aria-label="초대 코드 보기"
+        >
+          <Link size={18} strokeWidth={1.5} />
+        </button>
+      )}
+
+      <div className="flex-shrink-0 ml-1 text-right">
         {state.type === 'past' && (
           <span className="text-xs text-gray-400">약속 시간이 지났어요</span>
         )}

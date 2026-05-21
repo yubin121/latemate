@@ -6,9 +6,10 @@ import { cn } from '@/utils/cn'
 interface InviteShareProps {
   inviteCode: string
   onClose: () => void
+  title?: string
 }
 
-export default function InviteShare({ inviteCode, onClose }: InviteShareProps) {
+export default function InviteShare({ inviteCode, onClose, title = '약속이 만들어졌어요! 🎉' }: InviteShareProps) {
   const [copied, setCopied] = useState(false)
 
   async function handleCopyCode() {
@@ -22,7 +23,7 @@ export default function InviteShare({ inviteCode, onClose }: InviteShareProps) {
       <div className="w-full max-w-[430px] bg-white rounded-t-3xl p-6 pb-[calc(env(safe-area-inset-bottom)+24px)] animate-slide-up">
         {/* 닫기 */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-gray-900">약속이 만들어졌어요! 🎉</h2>
+          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
           <button
             onClick={onClose}
             className="w-11 h-11 flex items-center justify-center -mr-2 text-gray-400"

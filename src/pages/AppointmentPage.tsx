@@ -46,9 +46,10 @@ export default function AppointmentPage() {
   const { data: participants = [], isLoading: participantsLoading } = useParticipants(appointmentId!)
   const { data: timelineEvents = [], isLoading: timelineLoading } = useTimeline(appointmentId!)
 
-  const [showInvite, setShowInvite] = useState(
-    () => (location.state as { newlyCreated?: boolean } | null)?.newlyCreated === true,
-  )
+  const isNewlyCreated =
+    (location.state as { newlyCreated?: boolean } | null)?.newlyCreated === true
+  const [showInvite, setShowInvite] = useState(() => isNewlyCreated)
+  const [inviteOpenedByHost, setInviteOpenedByHost] = useState(false)
 
   if (isLoading || !appointment) {
     return (
@@ -60,7 +61,11 @@ export default function AppointmentPage() {
 
   return (
     <div className="flex flex-col h-dvh overflow-hidden bg-surface-page">
-      <AppointmentHeader appointment={appointment} />
+      <AppointmentHeader
+        appointment={appointment}
+        isHost={session?.isHost}
+        onShowInvite={() => { setInviteOpenedByHost(true); setShowInvite(true) }}
+      />
 
       {session && (
         <EtaController
@@ -107,7 +112,8 @@ export default function AppointmentPage() {
       {showInvite && (
         <InviteShare
           inviteCode={appointment.invite_code}
-          onClose={() => setShowInvite(false)}
+          onClose={() => { setShowInvite(false); setInviteOpenedByHost(false) }}
+          title={inviteOpenedByHost ? '초대 코드 공유' : '약속이 만들어졌어요! 🎉'}
         />
       )}
     </div>
