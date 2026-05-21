@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="192" y2="192">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#312E81"/>
+    </linearGradient>
+
+    <linearGradient id="pin" x1="40" y1="20" x2="150" y2="170">
+      <stop offset="0%" stop-color="#4338CA"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+
+  <path d="M96 22C63 22 38 47 38 80C38 124 96 172 96 172C96 172 154 124 154 80C154 47 129 22 96 22Z" fill="url(#pin)"/>
+
+  <circle cx="96" cy="80" r="42" fill="white"/>
+
+  <line x1="96" y1="80" x2="125" y2="80" stroke="#1E1B4B" stroke-width="10" stroke-linecap="round"/>
+  <line x1="96" y1="80" x2="76" y2="62" stroke="#1E1B4B" stroke-width="10" stroke-linecap="round"/>
+
+  <line x1="96" y1="80" x2="126" y2="56" stroke="#22C55E" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="126" cy="56" r="8" fill="#67E8F9"/>
+
+  <circle cx="96" cy="80" r="8" fill="#312E81"/>
+</svg>
