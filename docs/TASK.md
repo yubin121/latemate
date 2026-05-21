@@ -49,8 +49,8 @@
 | Phase 8 — 타임라인 기능       | 4개      | 1일       |
 | Phase 9 — UI/UX 개선          | 7개      | 1.5일     |
 | Phase 10 — 리팩토링 및 최적화 | 5개      | 1일       |
-| Phase 11 — 배포 후 개선       | 9개      | 추가 작업 |
-| **합계**                      | **69개** | **~13일** |
+| Phase 11 — 배포 후 개선       | 13개     | 추가 작업 |
+| **합계**                      | **73개** | **~13일** |
 
 ---
 
@@ -1826,6 +1826,102 @@ GitHub 공개를 위한 README.md를 작성한다.
 
 **원인**: scroll 이벤트 핸들러가 `window.scrollY > 500`이면 무조건 `true`로 덮어써서 `IntersectionObserver`의 숨김 결과를 무효화.  
 **수정 내용**: `bottomCtaInView` ref를 추가해 scroll 핸들러와 IntersectionObserver가 공유. scroll 핸들러는 `!bottomCtaInView.current`도 함께 체크.
+
+---
+
+### T-070 · manifest.json 아이콘 수정 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-065
+
+**작업 설명**  
+`manifest.json`에 16×16 favicon 파일이 잘못 포함되어 있던 것을 수정한다.
+
+**수정 내용**:
+- `public/manifest.json`에서 `favicon-16.svg`(16px) 항목 제거
+- 홈 화면 설치용 아이콘 `app-icon-192.svg`(192px)만 유지
+- 기존에 존재하지 않는 파일(`latemate_app_icon.svg`, `latemate_app_icon.png`)을 참조하던 것을 실제 파일로 교체
+
+**배경**: PWA manifest의 `icons`는 홈 화면·앱 설치용 아이콘으로 192×192 이상이 필요하다. 16×16 favicon은 브라우저 탭 전용이며 manifest에 포함하는 것은 부적절하다.
+
+---
+
+### T-071 · 타임라인 한국어 조사(이/가) 자동 처리 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-045
+
+**작업 설명**  
+타임라인 이벤트 텍스트에서 사용자 이름 뒤 조사를 이름의 마지막 글자 받침 여부에 따라 자동 선택한다.
+
+**수정 내용**:
+- `src/utils/korean.ts` 신규 생성
+  - `hasBatchim(str)`: 마지막 글자 받침 여부 판단 (유니코드 `0xAC00~0xD7A3` 범위, `(코드 - 0xAC00) % 28 !== 0` 공식)
+  - `subjectParticle(name)`: 받침 있으면 `'이'`, 없으면 `'가'` 반환
+- `src/features/timeline/Timeline.tsx`: 모든 `getText` 함수에서 `subjectParticle` 적용
+
+**결과**: `김민준이 참여했어요` / `이지수가 출발했어요` 와 같이 올바른 조사 사용.
+
+---
+
+### T-072 · 주최자 초대 코드 재열람 기능 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-023, T-030
+
+**작업 설명**  
+약속 생성 직후에만 볼 수 있던 초대 코드를 주최자가 언제든지 다시 확인하고 복사할 수 있도록 한다.
+
+**수정 내용**:
+- `AppointmentHeader.tsx`: `isHost`, `onShowInvite` prop 추가. 주최자일 때만 헤더 우측에 `Link` 아이콘 버튼 표시
+- `InviteShare.tsx`: `title` prop 추가 (기본값 `'약속이 만들어졌어요! 🎉'`)
+- `AppointmentPage.tsx`:
+  - `inviteOpenedByHost` state 추가 — 버튼으로 연 경우와 최초 생성(`newlyCreated`)을 구분
+  - 재열람 시 `InviteShare`에 `title="초대 코드 공유"` 전달
+
+**동작**:
+- 참여자(`isHost: false`): 헤더 버튼 미표시
+- 주최자(`isHost: true`): 헤더에 링크 아이콘 → 탭 시 초대 코드 모달 오픈
+
+---
+
+### T-073 · BottomSheet 드래그 인터랙션 개선 [x]
+
+- **난이도**: 🔴 Hard
+- **우선순위**: P1
+- **선행 작업**: T-011
+
+**작업 설명**  
+기존 BottomSheet의 드래그 점프, 리렌더 성능 문제, 속도 미반영 문제를 전면 재작성으로 해결한다.
+
+**기존 문제**:
+1. 드래그 시작 시 시트 위치 점프 — 스냅 위치가 Tailwind 퍼센트 클래스이고 드래그 시 인라인 `translateY(0px)`로 덮어써짐
+2. `setState` 남용 — 매 `pointermove` 마다 리렌더 발생
+3. 드래그 속도(플릭) 미반영 — 이동 거리 60px 기준만 사용
+
+**수정 내용** (`src/components/ui/BottomSheet.tsx` 전면 재작성):
+
+| 항목 | 이전 | 이후 |
+|------|------|------|
+| 스냅 위치 | Tailwind 퍼센트 클래스 | 컨테이너 높이 기준 픽셀값 실시간 계산 |
+| 드래그 중 업데이트 | `setState` → 리렌더 | `sheetRef.current.style.transform` 직접 조작 |
+| 드래그 시작 점프 | 인라인 0px로 순간이동 | `getComputedStyle` + `DOMMatrix.m42`로 현재 시각적 위치 읽어 연속 유지 |
+| 진행 중 애니메이션 | 무시됨 | pointerdown 시 현재 위치에서 중단 |
+| 스냅 결정 | 거리 60px 기준만 | 플릭 속도(0.4 px/ms) 감지 + 가장 가까운 스냅 흡착 |
+| 경계 초과 | 없음 | 러버밴드 저항 (0.3 감쇠) |
+| 초기 위치 설정 | `useEffect` (첫 프레임 후) | `useLayoutEffect` (페인트 전, 플래시 없음) |
+| 이징 | `cubic-bezier(0.34,1.56,0.64,1)` bounce | `cubic-bezier(0.32, 0.72, 0, 1)` iOS 스타일 |
+
+**핵심 구현 원리**:
+
+```
+pointerDown → getComputedStyle로 현재 시각적 Y 읽기 → transition 제거 → 그 자리에 고정
+pointerMove → startSheetY + pointerDelta 계산 → 경계 초과 시 러버밴드 → style.transform 직접 적용
+pointerUp   → velocity(px/ms) 기반 플릭 감지 → 목표 스냅 결정 → transition 복원 후 착지
+```
 
 ---
 
