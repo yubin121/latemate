@@ -158,7 +158,7 @@ export default function BottomSheet({ children, defaultSnap = 'half', className 
       </div>
 
       {/* 콘텐츠 */}
-      <div className="overflow-y-auto overscroll-contain h-[calc(100%-40px)] pb-[env(safe-area-inset-bottom)]">
+      <div className="overflow-y-auto overscroll-contain scrollbar-hide h-[calc(100%-40px)] pb-[env(safe-area-inset-bottom)]">
         {children}
       </div>
     </div>

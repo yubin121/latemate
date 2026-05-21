@@ -75,6 +75,10 @@
   50%       { transform: translateY(-12px); }
 }
 
+/* ── 스크롤바 숨김 유틸 ──────────────────────────── */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 /* ── 전역 기본값 ─────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
