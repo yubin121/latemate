@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useParams, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useAppointment } from '@/hooks/useAppointment'
 import { useParticipants } from '@/hooks/useParticipants'
 import { useTimeline } from '@/hooks/useTimeline'
@@ -40,6 +40,7 @@ function EtaController({
 export default function AppointmentPage() {
   const { appointmentId } = useParams<{ appointmentId: string }>()
   const location = useLocation()
+  const navigate = useNavigate()
   const session = useSessionStore((s) => s.session)
 
   const { data: appointment, isLoading } = useAppointment(appointmentId!)
@@ -50,6 +51,13 @@ export default function AppointmentPage() {
     (location.state as { newlyCreated?: boolean } | null)?.newlyCreated === true
   const [showInvite, setShowInvite] = useState(() => isNewlyCreated)
   const [inviteOpenedByHost, setInviteOpenedByHost] = useState(false)
+
+  // history state의 newlyCreated를 즉시 제거 — 새로고침 시 모달 재등장 방지
+  useEffect(() => {
+    if (isNewlyCreated) {
+      navigate('.', { replace: true, state: null })
+    }
+  }, [])
 
   if (isLoading || !appointment) {
     return (
