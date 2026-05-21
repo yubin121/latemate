@@ -71,15 +71,15 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
         style={{ aspectRatio: '9 / 19.5' }}
       >
         {/* Side buttons */}
-        <div className='absolute -left-[8px] top-[22%] w-[8px] h-7 bg-gray-700 rounded-l-md' />
-        <div className='absolute -left-[8px] top-[31%] w-[8px] h-11 bg-gray-700 rounded-l-md' />
-        <div className='absolute -left-[8px] top-[43%] w-[8px] h-11 bg-gray-700 rounded-l-md' />
-        <div className='absolute -right-[8px] top-[30%] w-[8px] h-14 bg-gray-700 rounded-r-md' />
+        <div className='absolute -left-2 top-[22%] w-2 h-7 bg-gray-700 rounded-l-md' />
+        <div className='absolute -left-2 top-[31%] w-2 h-11 bg-gray-700 rounded-l-md' />
+        <div className='absolute -left-2 top-[43%] w-2 h-11 bg-gray-700 rounded-l-md' />
+        <div className='absolute -right-2 top-[30%] w-2 h-14 bg-gray-700 rounded-r-md' />
 
         {/* Screen inset */}
         <div className='absolute inset-[7px] bg-white rounded-[36px] overflow-hidden'>
           {/* Dynamic island */}
-          <div className='absolute top-2.5 left-1/2 -translate-x-1/2 w-[68px] h-[22px] bg-gray-900 rounded-full z-30' />
+          <div className='absolute top-2.5 left-1/2 -translate-x-1/2 w-17 h-5.5 bg-gray-900 rounded-full z-30' />
           {/* Status bar */}
           <div
             className='absolute top-0 inset-x-0 flex items-center justify-between px-5 z-20'
@@ -146,7 +146,7 @@ function ChatScreen() {
   return (
     <div className='h-full flex flex-col bg-[#bacde0]'>
       {/* Header */}
-      <div className='bg-[#f6f6f6] flex items-center gap-2 px-3 py-2 border-b border-gray-200 flex-shrink-0'>
+      <div className='bg-[#f6f6f6] flex items-center gap-2 px-3 py-2 border-b border-gray-200 shrink-0'>
         <span className='text-[11px] text-gray-400'>‹</span>
         <div className='w-5 h-5 rounded-full bg-yellow-400 flex items-center justify-center text-[7px] font-bold text-yellow-900'>
           3
@@ -164,7 +164,7 @@ function ChatScreen() {
           <p className='text-[9px] text-gray-800'>오늘 몇시에 만나?</p>
         </div>
         <div className='flex items-end gap-1 self-start'>
-          <div className='w-5 h-5 rounded-full bg-pink-400 flex-shrink-0' />
+          <div className='w-5 h-5 rounded-full bg-pink-400 shrink-0' />
           <div className='bg-white rounded-2xl rounded-tl-none px-2.5 py-1.5'>
             <p className='text-[9px] text-gray-800'>지금 어디야? 🙄</p>
           </div>
@@ -173,13 +173,13 @@ function ChatScreen() {
           <p className='text-[9px] text-gray-800'>출발함~</p>
         </div>
         <div className='flex items-end gap-1 self-start'>
-          <div className='w-5 h-5 rounded-full bg-blue-400 flex-shrink-0' />
+          <div className='w-5 h-5 rounded-full bg-blue-400 shrink-0' />
           <div className='bg-white rounded-2xl rounded-tl-none px-2.5 py-1.5'>
             <p className='text-[9px] text-gray-800'>얼마나 걸려? ㅠ</p>
           </div>
         </div>
         <div className='flex items-end gap-1 self-start'>
-          <div className='w-5 h-5 rounded-full bg-pink-400 flex-shrink-0' />
+          <div className='w-5 h-5 rounded-full bg-pink-400 shrink-0' />
           <div className='bg-white rounded-2xl rounded-tl-none px-2.5 py-1.5'>
             <p className='text-[9px] text-gray-800'>야 빨리 와 ㅠㅠ</p>
           </div>
@@ -189,7 +189,7 @@ function ChatScreen() {
         </div>
       </div>
       {/* Input */}
-      <div className='bg-[#f6f6f6] flex items-center gap-1.5 px-2.5 py-1.5 flex-shrink-0'>
+      <div className='bg-[#f6f6f6] flex items-center gap-1.5 px-2.5 py-1.5 shrink-0'>
         <div className='flex-1 bg-white rounded-full h-6 px-2.5 flex items-center'>
           <span className='text-[7px] text-gray-400'>메시지 입력</span>
         </div>
@@ -205,7 +205,7 @@ function MapScreen() {
   return (
     <div className='h-full flex flex-col'>
       {/* Header */}
-      <div className='bg-white flex flex-col items-center px-3 py-2 shadow-sm flex-shrink-0'>
+      <div className='bg-white flex flex-col items-center px-3 py-2 shadow-sm shrink-0'>
         <p className='text-[10px] font-bold text-gray-900'>강남역 만남</p>
         <p className='text-[8px] text-brand-500 mt-0.5'>
           오늘 18:00 · 강남역 1번 출구
@@ -215,11 +215,11 @@ function MapScreen() {
       <div className='flex-1 relative overflow-hidden bg-[#e8f0e9]'>
         {/* Roads */}
         <div
-          className='absolute left-0 right-0 h-[10px] bg-white opacity-60'
+          className='absolute left-0 right-0 h-2.5 bg-white opacity-60'
           style={{ top: '44%' }}
         />
         <div
-          className='absolute top-0 bottom-0 w-[10px] bg-white opacity-60'
+          className='absolute top-0 bottom-0 w-2.5 bg-white opacity-60'
           style={{ left: '46%' }}
         />
         {/* Grid */}
@@ -279,7 +279,7 @@ function MapScreen() {
         </div>
       </div>
       {/* Bottom sheet */}
-      <div className='bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)] flex-shrink-0 px-3 pt-2 pb-3 rounded-t-2xl'>
+      <div className='bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)] shrink-0 px-3 pt-2 pb-3 rounded-t-2xl'>
         <div className='w-8 h-1 bg-gray-200 rounded-full mx-auto mb-2' />
         {[
           { name: '준영', eta: '2분', late: false },
@@ -370,7 +370,7 @@ export default function LandingPage() {
           <img
             src='/app-icon-192.svg'
             alt='LateMate'
-            className='w-9 h-9 rounded-xl object-cover flex-shrink-0'
+            className='w-9 h-9 rounded-xl object-cover shrink-0'
           />
           <span className='text-lg font-bold text-brand-700 tracking-tight'>
             LateMate
@@ -419,7 +419,7 @@ export default function LandingPage() {
             <button
               onClick={handleJoinByCode}
               disabled={!isCodeValid || loading}
-              className='h-12 px-5 rounded-2xl bg-gray-100 text-gray-700 font-semibold text-sm flex-shrink-0 disabled:opacity-40 active:scale-95 transition-transform'
+              className='h-12 px-5 rounded-2xl bg-gray-100 text-gray-700 font-semibold text-sm shrink-0 disabled:opacity-40 active:scale-95 transition-transform'
             >
               {loading ? '…' : '참여'}
             </button>
@@ -428,7 +428,11 @@ export default function LandingPage() {
 
         {/* Scroll hint */}
         <div className='relative z-10 flex justify-center'>
-          <ChevronDown size={24} strokeWidth={1.5} className='text-gray-400 opacity-35 animate-bounce' />
+          <ChevronDown
+            size={24}
+            strokeWidth={1.5}
+            className='text-gray-400 opacity-35 animate-bounce'
+          />
         </div>
       </section>
 
@@ -519,7 +523,7 @@ export default function LandingPage() {
             <FadeUp key={f.title} delay={i * 100}>
               <div className='bg-white rounded-2xl px-4 py-5 shadow-sm flex items-start gap-4'>
                 <div
-                  className={`w-11 h-11 rounded-2xl flex-shrink-0 flex items-center justify-center ${f.bg} ${f.color}`}
+                  className={`w-11 h-11 rounded-2xl shrink-0 flex items-center justify-center ${f.bg} ${f.color}`}
                 >
                   {f.icon}
                 </div>
@@ -635,7 +639,7 @@ export default function LandingPage() {
           pointerEvents: showStickyBar ? 'auto' : 'none',
         }}
       >
-        <div className='w-full max-w-[430px] px-4'>
+        <div className='w-full max-w-107.5 px-4'>
           <button
             onClick={() => navigate('/create')}
             className='w-full h-14 rounded-2xl bg-brand-600 text-white font-bold text-[15px] flex items-center justify-center gap-2 active:scale-95 transition-transform'

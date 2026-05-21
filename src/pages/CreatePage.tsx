@@ -68,7 +68,7 @@ export default function CreatePage() {
   return (
     <div className='flex flex-col min-h-dvh bg-surface-page'>
       {/* 헤더 */}
-      <header className='flex items-center h-14 px-4 bg-white border-b border-gray-100 flex-shrink-0'>
+      <header className='flex items-center h-14 px-4 bg-white border-b border-gray-100 shrink-0'>
         <button
           onClick={() => navigate(-1)}
           className='w-11 h-11 flex items-center justify-center -ml-2 text-gray-600'
@@ -183,7 +183,7 @@ export default function CreatePage() {
       </div>
 
       {/* 하단 고정 CTA */}
-      <div className='fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+16px)] bg-white border-t border-gray-100'>
+      <div className='fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-107.5 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+16px)] bg-white border-t border-gray-100'>
         <Button
           size='lg'
           className='w-full'
