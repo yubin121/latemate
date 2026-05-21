@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Navigation } from 'lucide-react'
 import { useLocationStore } from '@/stores/locationStore'
 import { useGeolocation } from '@/hooks/useGeolocation'
@@ -13,6 +14,11 @@ interface LocationControlProps {
 export default function LocationControl({ participantId, appointmentId }: LocationControlProps) {
   const { isSharing, error } = useLocationStore()
   const { startSharing, stopSharing } = useGeolocation({ participantId })
+
+  // 새로고침 후 isSharing이 persist로 복원된 경우 GPS watchPosition 재연결
+  useEffect(() => {
+    if (isSharing) startSharing()
+  }, [])
 
   async function handleStart() {
     // DEPARTED 타임라인 이벤트 기록 (T-043)

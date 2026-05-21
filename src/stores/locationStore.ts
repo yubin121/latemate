@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { Coords } from '@/types'
 
 interface LocationStore {
@@ -14,16 +15,25 @@ interface LocationStore {
   reset: () => void
 }
 
-export const useLocationStore = create<LocationStore>((set) => ({
-  isSharing: false,
-  currentCoords: null,
-  accuracy: null,
-  error: null,
-  watchId: null,
-  setSharing: (isSharing) => set({ isSharing }),
-  setCoords: (coords, accuracy) => set({ currentCoords: coords, accuracy, error: null }),
-  setError: (error) => set({ error }),
-  setWatchId: (watchId) => set({ watchId }),
-  reset: () =>
-    set({ isSharing: false, currentCoords: null, accuracy: null, error: null, watchId: null }),
-}))
+export const useLocationStore = create<LocationStore>()(
+  persist(
+    (set) => ({
+      isSharing: false,
+      currentCoords: null,
+      accuracy: null,
+      error: null,
+      watchId: null,
+      setSharing: (isSharing) => set({ isSharing }),
+      setCoords: (coords, accuracy) => set({ currentCoords: coords, accuracy, error: null }),
+      setError: (error) => set({ error }),
+      setWatchId: (watchId) => set({ watchId }),
+      reset: () =>
+        set({ isSharing: false, currentCoords: null, accuracy: null, error: null, watchId: null }),
+    }),
+    {
+      name: 'latemate-location',
+      // isSharing만 persist — watchId·coords는 런타임 값이라 저장 불필요
+      partialize: (state) => ({ isSharing: state.isSharing }),
+    },
+  ),
+)
