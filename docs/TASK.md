@@ -49,8 +49,8 @@
 | Phase 8 — 타임라인 기능       | 4개      | 1일       |
 | Phase 9 — UI/UX 개선          | 7개      | 1.5일     |
 | Phase 10 — 리팩토링 및 최적화 | 5개      | 1일       |
-| Phase 11 — 배포 후 개선       | 13개     | 추가 작업 |
-| **합계**                      | **73개** | **~13일** |
+| Phase 11 — 배포 후 개선       | 16개     | 추가 작업 |
+| **합계**                      | **76개** | **~13일** |
 
 ---
 
@@ -1922,6 +1922,51 @@ pointerDown → getComputedStyle로 현재 시각적 Y 읽기 → transition 제
 pointerMove → startSheetY + pointerDelta 계산 → 경계 초과 시 러버밴드 → style.transform 직접 적용
 pointerUp   → velocity(px/ms) 기반 플릭 감지 → 목표 스냅 결정 → transition 복원 후 착지
 ```
+
+---
+
+### T-074 · BottomSheet 스크롤바 숨기기 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P2
+- **선행 작업**: T-073
+
+**작업 설명**  
+웹 브라우저에서 BottomSheet 콘텐츠 영역에 스크롤바가 표시되는 문제를 수정한다.
+
+**수정 내용**:
+- `src/index.css`: `.scrollbar-hide` 유틸 클래스 추가 (`-webkit-scrollbar: none`, `scrollbar-width: none`)
+- `src/components/ui/BottomSheet.tsx`: 콘텐츠 div에 `scrollbar-hide` 클래스 추가
+
+---
+
+### T-075 · 새로고침 시 InviteShare 모달 재등장 방지 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-023, T-072
+
+**작업 설명**  
+약속 생성 직후 표시되는 초대 코드 모달이 페이지 새로고침 후에도 다시 나타나는 버그를 수정한다.
+
+**원인**: React Router `location.state`는 브라우저 History API `state`에 저장되어 새로고침 후에도 유지됨.  
+**수정 내용**: `AppointmentPage.tsx`에서 `isNewlyCreated === true` 시 `useEffect`로 즉시 `navigate('.', { replace: true, state: null })` 호출해 history state 초기화.
+
+---
+
+### T-076 · 새로고침 시 위치 공유 상태 유지 [x]
+
+- **난이도**: 🟡 Medium
+- **우선순위**: P1
+- **선행 작업**: T-032, T-035
+
+**작업 설명**  
+위치 공유 중 페이지를 새로고침하면 공유 버튼이 꺼지고 GPS 추적이 중단되는 문제를 수정한다.
+
+**원인**: `locationStore`에 persist가 없어 `isSharing`이 새로고침 시 `false`로 초기화됨. GPS `watchPosition`도 함께 끊어짐.  
+**수정 내용**:
+- `src/stores/locationStore.ts`: `persist` 미들웨어 추가. `isSharing`만 localStorage 저장 (`partialize`로 `watchId`·`coords` 등 런타임 값 제외)
+- `src/features/location/LocationControl.tsx`: 마운트 시 `isSharing === true`이면 `startSharing()` 자동 호출로 GPS 재연결
 
 ---
 
