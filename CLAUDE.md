@@ -135,7 +135,8 @@ src/
 └── utils/
     ├── cn.ts               # clsx + tailwind-merge
     ├── formatTime.ts       # HH:MM 포맷, 상대 시각
-    └── distance.ts         # Haversine 거리 계산 (미터 단위)
+    ├── distance.ts         # Haversine 거리 계산 (미터 단위)
+    └── korean.ts           # 한국어 조사 유틸 (subjectParticle: 이/가)
 ```
 
 ---
