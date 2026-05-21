@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Clock } from 'lucide-react'
 import { formatHHMM } from '@/utils/formatTime'
 import { cn } from '@/utils/cn'
+import { subjectParticle } from '@/utils/korean'
 import type { TimelineEventWithNickname } from '@/lib/api/timeline'
 import type { TimelineEventType } from '@/types'
 
@@ -15,22 +16,22 @@ interface EventConfig {
 const EVENT_CONFIG: Record<TimelineEventType, EventConfig> = {
   JOINED: {
     icon: '👋',
-    getText: (n) => `${n ?? '알 수 없음'}이 참여했어요`,
+    getText: (n) => { const name = n ?? '알 수 없음'; return `${name}${subjectParticle(name)} 참여했어요` },
     dotClass: 'bg-gray-300',
   },
   DEPARTED: {
     icon: '🏃',
-    getText: (n) => `${n ?? '알 수 없음'}이 출발했어요`,
+    getText: (n) => { const name = n ?? '알 수 없음'; return `${name}${subjectParticle(name)} 출발했어요` },
     dotClass: 'bg-brand-500',
   },
   ARRIVED: {
     icon: '🎉',
-    getText: (n) => `${n ?? '알 수 없음'}이 도착했어요`,
+    getText: (n) => { const name = n ?? '알 수 없음'; return `${name}${subjectParticle(name)} 도착했어요` },
     dotClass: 'bg-status-arrived',
   },
   LATE_ALERT: {
     icon: '⚠️',
-    getText: (n) => `${n ?? '알 수 없음'}이 지각 예상이에요`,
+    getText: (n) => { const name = n ?? '알 수 없음'; return `${name}${subjectParticle(name)} 지각 예상이에요` },
     dotClass: 'bg-status-late',
     textClass: 'text-status-late',
   },
