@@ -60,15 +60,13 @@ function FadeUp({
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className='relative mx-auto'
+      className='relative mx-auto w-[220px]'
       style={{
-        width: 220,
         filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.25))',
       }}
     >
       <div
-        className='relative bg-gray-800 rounded-[42px] overflow-visible'
-        style={{ aspectRatio: '9 / 19.5' }}
+        className='relative bg-gray-800 rounded-[42px] overflow-visible aspect-[9/19.5]'
       >
         {/* Side buttons */}
         <div className='absolute -left-2 top-[22%] w-2 h-7 bg-gray-700 rounded-l-md' />
@@ -82,8 +80,7 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
           <div className='absolute top-2.5 left-1/2 -translate-x-1/2 w-17 h-5.5 bg-gray-900 rounded-full z-30' />
           {/* Status bar */}
           <div
-            className='absolute top-0 inset-x-0 flex items-center justify-between px-5 z-20'
-            style={{ height: 44 }}
+            className='absolute top-0 inset-x-0 flex items-center justify-between px-5 z-20 h-11'
           >
             <span className='text-[10px] font-semibold text-gray-800'>
               9:41
@@ -215,12 +212,10 @@ function MapScreen() {
       <div className='flex-1 relative overflow-hidden bg-[#e8f0e9]'>
         {/* Roads */}
         <div
-          className='absolute left-0 right-0 h-2.5 bg-white opacity-60'
-          style={{ top: '44%' }}
+          className='absolute left-0 right-0 h-2.5 bg-white opacity-60 top-[44%]'
         />
         <div
-          className='absolute top-0 bottom-0 w-2.5 bg-white opacity-60'
-          style={{ left: '46%' }}
+          className='absolute top-0 bottom-0 w-2.5 bg-white opacity-60 left-[46%]'
         />
         {/* Grid */}
         {[15, 30, 60, 78].map((p) => (
@@ -239,18 +234,15 @@ function MapScreen() {
         ))}
         {/* Green patches */}
         <div
-          className='absolute w-10 h-8 bg-green-200 rounded-lg opacity-80'
-          style={{ top: '8%', left: '8%' }}
+          className='absolute w-10 h-8 bg-green-200 rounded-lg opacity-80 top-[8%] left-[8%]'
         />
         <div
-          className='absolute w-8 h-9 bg-green-200 rounded-lg opacity-80'
-          style={{ bottom: '12%', right: '8%' }}
+          className='absolute w-8 h-9 bg-green-200 rounded-lg opacity-80 bottom-[12%] right-[8%]'
         />
 
         {/* Destination pin */}
         <div
-          className='absolute z-20 -translate-x-1/2 -translate-y-full'
-          style={{ top: '45%', left: '50%' }}
+          className='absolute z-20 -translate-x-1/2 -translate-y-full top-[45%] left-1/2'
         >
           <div className='w-7 h-7 rounded-full bg-brand-600 border-2 border-white shadow-lg flex items-center justify-center'>
             <MapPin size={12} className='text-white' strokeWidth={2.5} />
@@ -259,19 +251,19 @@ function MapScreen() {
         </div>
 
         {/* Participant markers */}
-        <div className='absolute z-10' style={{ top: '18%', left: '14%' }}>
+        <div className='absolute z-10 top-[18%] left-[14%]'>
           <div className='bg-emerald-500 text-white text-[7px] font-bold rounded-full px-2 py-1 shadow-md whitespace-nowrap flex items-center gap-1'>
             <div className='w-1.5 h-1.5 rounded-full bg-white' />
             준영 · 2분
           </div>
         </div>
-        <div className='absolute z-10' style={{ top: '62%', left: '58%' }}>
+        <div className='absolute z-10 top-[62%] left-[58%]'>
           <div className='bg-red-500 text-white text-[7px] font-bold rounded-full px-2 py-1 shadow-md whitespace-nowrap flex items-center gap-1'>
             <div className='w-1.5 h-1.5 rounded-full bg-white' />
             지수 · 15분
           </div>
         </div>
-        <div className='absolute z-10' style={{ top: '28%', left: '65%' }}>
+        <div className='absolute z-10 top-[28%] left-[65%]'>
           <div className='bg-emerald-500 text-white text-[7px] font-bold rounded-full px-2 py-1 shadow-md whitespace-nowrap flex items-center gap-1'>
             <div className='w-1.5 h-1.5 rounded-full bg-white' />
             민준 · 6분
