@@ -73,7 +73,7 @@ npm run lint
 |------|------|
 | 빌드 | Vite |
 | UI | React 18 + TypeScript |
-| 스타일링 | TailwindCSS v3 |
+| 스타일링 | TailwindCSS v4 (`@tailwindcss/vite` + `@theme`) |
 | 라우팅 | React Router DOM v6 (`createBrowserRouter`) |
 | 서버 상태 | TanStack Query v5 |
 | 클라이언트 상태 | Zustand v5 (persist 미들웨어 포함) |
