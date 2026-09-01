@@ -55,6 +55,15 @@ npm run dev
 # 타입 검사
 npm run typecheck
 
+# 테스트 실행 (Vitest, 1회)
+npm test
+
+# 테스트 watch 모드 (개발 중)
+npm run test:watch
+
+# 커버리지 리포트 생성
+npm run test:coverage
+
 # 빌드
 npm run build
 
@@ -72,9 +81,9 @@ npm run lint
 | 역할            | 기술                                            |
 | --------------- | ----------------------------------------------- |
 | 빌드            | Vite                                            |
-| UI              | React 18 + TypeScript                           |
+| UI              | React 19 + TypeScript                           |
 | 스타일링        | TailwindCSS v4 (`@tailwindcss/vite` + `@theme`) |
-| 라우팅          | React Router DOM v6 (`createBrowserRouter`)     |
+| 라우팅          | React Router DOM v7 (`createBrowserRouter`)     |
 | 서버 상태       | TanStack Query v5                               |
 | 클라이언트 상태 | Zustand v5 (persist 미들웨어 포함)              |
 | 백엔드/DB       | Supabase (PostgreSQL + RLS)                     |
@@ -83,6 +92,7 @@ npm run lint
 | 장소 검색       | Kakao Local Search API (REST)                   |
 | 아이콘          | Lucide React (`strokeWidth={1.5}` 통일)         |
 | 클래스 유틸     | clsx + tailwind-merge (`cn()` 래퍼)             |
+| 테스트          | Vitest + React Testing Library + jsdom (`TZ=Asia/Seoul`) |
 
 ### 폴더 구조
 
@@ -113,7 +123,7 @@ src/
 │
 ├── stores/                 # Zustand 스토어
 │   ├── sessionStore.ts     # 현재 사용자 세션 (localStorage persist)
-│   └── locationStore.ts    # 위치 공유 UI 상태 (persist 없음)
+│   └── locationStore.ts    # 위치 공유 UI 상태 (isSharing만 persist)
 │
 ├── lib/
 │   ├── supabase.ts         # Supabase 클라이언트 싱글톤
