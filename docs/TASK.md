@@ -2027,4 +2027,59 @@ pointerUp   → velocity(px/ms) 기반 플릭 감지 → 목표 스냅 결정 �
 
 ---
 
+### T-080 · 테스트 인프라 도입 (Vitest + RTL) [x]
+
+- **난이도**: 🟡 Medium
+- **우선순위**: P1
+- **선행 작업**: 없음
+
+**작업 설명**
+회귀 방지 안전망 확보를 위해 Vitest + React Testing Library 기반 테스트 인프라를 구축한다. 실제 발생 이력이 있는 버그(T-062, T-063, T-071)를 자동 검출할 수 있도록 실사용 로직 위주로 커버.
+
+**설치 패키지** (모두 devDependencies)
+- `vitest@4.1.11`
+- `@vitest/coverage-v8@4.1.11`
+- `@testing-library/react@16.3.3` (React 19 지원)
+- `@testing-library/jest-dom@7.0.1`
+- `jsdom@29.1.1`
+
+**설정 파일**
+- `vitest.config.ts`: jsdom 환경, `TZ=Asia/Seoul` 강제, `@` alias 재정의
+- `src/test/setup.ts`: jest-dom matcher 등록
+- `package.json` scripts: `test`, `test:watch`, `test:coverage`
+
+**리팩토링 (기능 무변경 · 테스트 가능성 확보)**
+- `src/hooks/useEta.ts`: `determineStatus`를 named export
+- `src/lib/api/participants.ts`: 인라인 정규화 로직을 `normalizeParticipantRow` 함수로 승격·export
+- `src/features/appointment/AppointmentHeader.tsx`: `getCountdownState`, `CountdownState` 타입 export
+
+**테스트 파일** (8 파일, 총 48 케이스)
+
+| 파일 | 케이스 | 검증 초점 |
+|---|---|---|
+| `src/utils/distance.test.ts` | 5 | Haversine 정확도, `isWithinRadius` `<=` 경계 |
+| `src/utils/formatTime.test.ts` | 9 | KST 포맷, 음수 diff 처리, `Math.ceil` 경계 |
+| `src/utils/korean.test.ts` | 7 | 조사(이/가) 판정, 비한글·빈문자열 crash 방지 |
+| `src/hooks/useEta.test.ts` | 6 | 반경 우선순위, `LATE_BUFFER` `>` 경계 (±1ms) |
+| `src/lib/api/participants.test.ts` | 4 | **T-063 회귀 방지** — PostgREST 배열/객체/null 응답 정규화 |
+| `src/features/timeline/Timeline.test.tsx` | 6 | **T-071 회귀 방지** — 조사 처리, null nickname fallback, Empty 상태 |
+| `src/components/ui/StatusBadge.test.tsx` | 4 | 4개 상태 텍스트 매핑 |
+| `src/features/appointment/AppointmentHeader.test.tsx` | 7 | **T-062 회귀 방지** — past/countdown/future, 24h 경계, 캘린더 일자 계산 |
+
+**검증 결과**
+- `npm test`: 48/48 통과 (4.3초)
+- `npm run typecheck`: 통과
+
+**Out of Scope (Phase C에서 명시적으로 제외)**
+- E2E (Playwright) — 후속 그룹에서 재검토
+- 훅 통합 테스트 (`useEta`, `useGeolocation` 전체) — 모킹 비용 과다
+- BottomSheet 터치 인터랙션 — pointer 이벤트 검증 복잡
+- CI 파이프라인 연결 — 로컬 실행만
+
+**기대 결과물**
+- T-062/T-063/T-071 회귀가 push 전에 자동 검출됨
+- 이후 그룹 2·3(백엔드 강화·아키텍처 전환) 진행 시 회귀 안전망 확보
+
+---
+
 _이 문서는 개발 진행에 따라 작업 완료 표시 및 신규 발견 작업을 추가하며 지속 업데이트한다._
