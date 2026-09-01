@@ -14,7 +14,7 @@ interface UseEtaOptions {
   scheduledAt: string
 }
 
-function determineStatus(
+export function determineStatus(
   etaSeconds: number,
   scheduledAt: string,
   currentCoords: Coords,

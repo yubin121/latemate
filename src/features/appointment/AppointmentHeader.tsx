@@ -10,12 +10,12 @@ interface AppointmentHeaderProps {
   onBack?: () => void
 }
 
-type CountdownState =
+export type CountdownState =
   | { type: 'past' }
   | { type: 'future'; label: string; timeStr: string }
   | { type: 'countdown'; value: string }
 
-function getCountdownState(scheduledAt: string): CountdownState {
+export function getCountdownState(scheduledAt: string): CountdownState {
   const target = new Date(scheduledAt)
   const now = new Date()
   const diffMs = target.getTime() - now.getTime()

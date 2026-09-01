@@ -35,6 +35,21 @@ export async function createHostParticipant(
   return data as Participant
 }
 
+export function normalizeParticipantRow(
+  row: Record<string, unknown>,
+): ParticipantWithLocation {
+  const locations = row['participant_locations']
+  return {
+    id: row.id as string,
+    appointment_id: row.appointment_id as string,
+    nickname: row.nickname as string,
+    session_key: row.session_key as string,
+    is_host: row.is_host as boolean,
+    joined_at: row.joined_at as string,
+    location: Array.isArray(locations) ? (locations[0] ?? null) : (locations ?? null),
+  } as ParticipantWithLocation
+}
+
 export async function fetchParticipantsWithLocations(
   appointmentId: string,
 ): Promise<ParticipantWithLocation[]> {
@@ -46,18 +61,9 @@ export async function fetchParticipantsWithLocations(
 
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row) => {
-    const locations = (row as Record<string, unknown>)['participant_locations']
-    return {
-      id: row.id as string,
-      appointment_id: row.appointment_id as string,
-      nickname: row.nickname as string,
-      session_key: row.session_key as string,
-      is_host: row.is_host as boolean,
-      joined_at: row.joined_at as string,
-      location: Array.isArray(locations) ? (locations[0] ?? null) : (locations ?? null),
-    } as ParticipantWithLocation
-  })
+  return (data ?? []).map((row) =>
+    normalizeParticipantRow(row as Record<string, unknown>),
+  )
 }
 
 export async function restoreSession(
