@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- 순수 함수·타입을 테스트 대상으로 export */
 import { useState, useEffect } from 'react'
 import { MapPin, Link, House } from 'lucide-react'
 import { formatCountdown, formatHHMM } from '@/utils/formatTime'

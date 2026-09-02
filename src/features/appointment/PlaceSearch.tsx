@@ -24,11 +24,7 @@ export default function PlaceSearch({ value, onChange, error }: PlaceSearchProps
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([])
-      setOpen(false)
-      return
-    }
+    if (!query.trim()) return
 
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(async () => {
@@ -48,6 +44,15 @@ export default function PlaceSearch({ value, onChange, error }: PlaceSearchProps
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [query])
+
+  function handleQueryChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value
+    setQuery(value)
+    if (!value.trim()) {
+      setResults([])
+      setOpen(false)
+    }
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -96,7 +101,7 @@ export default function PlaceSearch({ value, onChange, error }: PlaceSearchProps
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleQueryChange}
           placeholder="장소 검색"
           className={cn(
             'h-12 pl-10 pr-4 w-full rounded-2xl border bg-white text-base outline-none transition-colors',

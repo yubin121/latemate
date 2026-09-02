@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { cn } from '@/utils/cn'
 import type { ParticipantStatus } from '@/types'
 
@@ -16,20 +15,14 @@ const STATUS_CONFIG: Record<ParticipantStatus, { label: string; className: strin
 
 export default function StatusBadge({ status, className }: StatusBadgeProps) {
   const config = STATUS_CONFIG[status]
-  const [animating, setAnimating] = useState(false)
-
-  useEffect(() => {
-    setAnimating(true)
-    const t = setTimeout(() => setAnimating(false), 400)
-    return () => clearTimeout(t)
-  }, [status])
 
   return (
     <span
+      key={status}
       className={cn(
         'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold',
         config.className,
-        animating && 'animate-[shake-once_0.4s_ease-out]',
+        'animate-[shake-once_0.4s_ease-out]',
         className,
       )}
     >

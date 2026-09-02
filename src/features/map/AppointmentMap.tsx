@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { MapPin } from 'lucide-react'
 import type { KakaoMap, KakaoCustomOverlay } from '@/lib/kakao'
 import type { Appointment, ParticipantWithLocation, ParticipantStatus } from '@/types'
@@ -86,16 +86,11 @@ export default function AppointmentMap({
   const destMarkerRef = useRef<KakaoCustomOverlay | null>(null)
   const participantMarkersRef = useRef<Map<string, KakaoCustomOverlay>>(new Map())
   const userInteractedRef = useRef(false)
-  const [kakaoUnavailable, setKakaoUnavailable] = useState(false)
+  const kakaoUnavailable = typeof window === 'undefined' || typeof window.kakao === 'undefined'
 
   // 지도 초기화
   useEffect(() => {
-    if (!containerRef.current) return
-
-    if (typeof window.kakao === 'undefined') {
-      setKakaoUnavailable(true)
-      return
-    }
+    if (kakaoUnavailable || !containerRef.current) return
 
     window.kakao.maps.load(() => {
       if (mapRef.current) return // 중복 초기화 방지
@@ -121,13 +116,14 @@ export default function AppointmentMap({
     })
 
     return () => {
-      // 마커 정리
-      participantMarkersRef.current.forEach((overlay) => overlay.setMap(null))
-      participantMarkersRef.current.clear()
+      // 마커 정리 — 언마운트 시점 스냅샷을 참조해 stale ref 경고 회피
+      const markers = participantMarkersRef.current
+      markers.forEach((overlay) => overlay.setMap(null))
+      markers.clear()
       destMarkerRef.current?.setMap(null)
       mapRef.current = null
     }
-  }, [appointment.place_lat, appointment.place_lng])
+  }, [kakaoUnavailable, appointment.place_lat, appointment.place_lng])
 
   // 참여자 마커 동기화 + bounds 조정
   useEffect(() => {
