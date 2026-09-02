@@ -64,6 +64,15 @@ npm run test:watch
 # 커버리지 리포트 생성
 npm run test:coverage
 
+# E2E 테스트 (Playwright, chromium)
+npm run test:e2e
+
+# E2E UI 모드 (인터랙티브 디버깅)
+npm run test:e2e:ui
+
+# 마지막 E2E 리포트 열기
+npm run test:e2e:report
+
 # 빌드
 npm run build
 
@@ -92,7 +101,9 @@ npm run lint
 | 장소 검색       | Kakao Local Search API (REST)                   |
 | 아이콘          | Lucide React (`strokeWidth={1.5}` 통일)         |
 | 클래스 유틸     | clsx + tailwind-merge (`cn()` 래퍼)             |
-| 테스트          | Vitest + React Testing Library + jsdom (`TZ=Asia/Seoul`) |
+| 테스트 (유닛)   | Vitest + React Testing Library + jsdom (`TZ=Asia/Seoul`) |
+| 테스트 (E2E)    | Playwright (chromium, 모바일 뷰포트, Kakao·Supabase route mock) |
+| CI              | GitHub Actions — push/PR 시 typecheck·lint·유닛·E2E 순차 실행 |
 
 ### 폴더 구조
 

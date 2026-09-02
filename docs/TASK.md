@@ -2082,4 +2082,119 @@ pointerUp   → velocity(px/ms) 기반 플릭 감지 → 목표 스냅 결정 �
 
 ---
 
+### T-081 · Playwright E2E 인프라 도입 [x]
+
+- **난이도**: 🟡 Medium
+- **우선순위**: P1
+- **선행 작업**: T-080
+
+**작업 설명**
+유닛 테스트가 커버하지 못하는 사용자 시나리오 계층의 회귀 안전망을 확보한다. 실제 Kakao/Supabase 호출 없이 Playwright route intercept로 mock 하는 방식(A안). 근거·트레이드오프는 대화 히스토리 참조 (Testing Trophy · Playwright network mocking 가이드).
+
+**설치 패키지**
+- `@playwright/test@1.62.1` (dev)
+- `chromium` 브라우저 (playwright install)
+
+**설정 파일**
+- `playwright.config.ts`: 모바일 뷰포트 390×844, `ko-KR`, `Asia/Seoul`, geolocation 강남역(37.4979, 127.0276), permissions `['geolocation']`, `webServer`가 `npm run build && npm run preview` 자동 부팅, VITE_* 환경변수는 e2e 전용 placeholder 주입
+- `e2e/mocks/kakao.ts`: SDK script 요청 intercept → 최소 stub(`window.kakao.maps.{load, LatLng, Map, CustomOverlay, ...}`), Local Search·Directions 응답 mock
+- `e2e/mocks/supabase.ts`: `**/rest/v1/**` intercept, in-memory state로 appointments·participants·participant_locations·timeline_events CRUD 처리
+- `e2e/mocks/index.ts`: `setupMocks(page)` 통합 헬퍼
+- `e2e/fixtures/session.ts`: `primeSession(page, ...)` — Zustand persist 형식으로 localStorage 프리시드
+- `package.json` scripts: `test:e2e`, `test:e2e:ui`, `test:e2e:report`
+- `eslint.config.js`: e2e/ 블록에 Node globals 허용, `.artifacts` 무시
+- `.gitignore`: `e2e/.artifacts/`, `playwright-report/`, `test-results/`
+
+**결정 사항**
+- 브라우저는 chromium 단독 (CI 시간 3~4배 절감, 모바일 웹 대상 서비스라 충분)
+- Supabase는 mock (A안): 실제 스키마·RLS 검증은 유닛/수동 몫
+
+**Out of Scope**
+- Firefox/WebKit — 후속
+- 실제 Supabase 대상 smoke test — 후속 (옵션 C 확장 여지)
+- BottomSheet 터치 드래그 — pointer 이벤트 복잡도
+
+---
+
+### T-082 · E2E 골든패스 시나리오 4건 작성 [x]
+
+- **난이도**: 🟡 Medium
+- **우선순위**: P1
+- **선행 작업**: T-081
+
+**작업 설명**
+사용자 핵심 흐름을 브라우저 자동화로 검증. 유닛(T-080)이 이미 커버하는 T-062/T-063/T-071는 제외.
+
+**시나리오 4건 (`e2e/*.spec.ts`)**
+
+| 파일 | 시나리오 | 검증 초점 |
+|---|---|---|
+| `create-appointment.spec.ts` | 랜딩 → 약속 만들기 폼 → 제출 → `/appointment/:id` 이동 + InviteShare 모달 | Kakao Local mock 응답 선택, invite_code 노출, `latemate_session_key` 저장 |
+| `join-appointment.spec.ts` | 랜딩 → 초대 코드 입력 → JoinPage → 참여 → 세션 저장 | 대소문자 정규화, Zustand persist 확인, participants 레코드 검증 |
+| `location-share.spec.ts` | 약속 페이지 → "위치 공유 시작하기" → 상태 전환 + Supabase 위치 upsert | Playwright geolocation → participant_locations 폴링, 좌표 근사 검증 |
+| `persist-sharing.spec.ts` | **T-076 회귀** — 공유 시작 → 새로고침 → "위치 공유 중" 복원 | `latemate-location` persist 유지 |
+
+**검증 결과**
+- `npm run test:e2e`: 4/4 통과 (chromium, ~13초)
+
+**Out of Scope**
+- 데스크탑 SplitLayout — 모바일 우선 서비스
+- ETA/지각 배지 흐름 — 유닛 테스트로 충분히 커버
+
+---
+
+### T-083 · GitHub Actions CI 파이프라인 구축 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-082
+
+**작업 설명**
+push/PR 시 품질 게이트가 자동 실행되도록 GitHub Actions 워크플로 구축.
+
+**파일**: `.github/workflows/ci.yml`
+
+**트리거**: `push: [main]`, `pull_request`. `concurrency` 그룹으로 브랜치별 중복 실행 취소.
+
+**Job 구조**
+1. `quality` — Node 22 + npm cache → `typecheck` → `lint` → `test`(Vitest)
+2. `e2e` — needs `quality`. Playwright 브라우저 캐시(`~/.cache/ms-playwright`, key = `package-lock.json` 해시) → `npx playwright install --with-deps chromium` (miss 시) 또는 `install-deps` (hit 시) → `npm run test:e2e` → 실패 시 `e2e/.artifacts/` 아티팩트 업로드 (14일 보관)
+
+**환경 변수**: 없음 (E2E가 mock 기반이라 Supabase/Kakao 키 불필요)
+
+**Vercel과의 관계**: 배포는 Vercel이 계속 담당, CI는 병합 전 게이트로만 동작.
+
+**Out of Scope**
+- Vercel Preview URL 대상 원격 smoke test — secrets/타이밍 복잡도로 후속 과제
+
+---
+
+### T-084 · Pre-existing 린트 오류 10건 정리 [x]
+
+- **난이도**: 🟢 Easy
+- **우선순위**: P1
+- **선행 작업**: T-083 (CI에서 `npm run lint` 활성화)
+
+**작업 설명**
+T-083에서 CI에 lint 스텝을 활성화하면서 확인된 pre-existing 10건 정리. `git stash` 검증으로 T-080 이전부터 존재했음을 확인.
+
+**수정 내역**
+
+| 파일 | 문제 | 해결 |
+|---|---|---|
+| `vitest.config.ts` | `@typescript-eslint/triple-slash-reference` | 불필요한 `/// <reference>` 제거 (`defineConfig`가 타입 제공) |
+| `src/router.tsx` (5건) | `react-refresh/only-export-components` | 파일 상단 `/* eslint-disable react-refresh/only-export-components */` — router 설정 파일 특성상 non-component export 필수 |
+| `src/features/appointment/AppointmentHeader.tsx` | 상동 | 파일 상단 disable — T-080에서 테스트 대상 함수·타입 export한 의도된 패턴 |
+| `src/components/ui/StatusBadge.tsx` | `react-hooks/set-state-in-effect` | `useState`+`useEffect` 제거하고 `key={status}` 트릭으로 CSS 애니메이션 재실행 — 상태 없이 동등한 UX |
+| `src/features/appointment/PlaceSearch.tsx` | 상동 | 빈 쿼리 시 `setResults([])`·`setOpen(false)`을 effect body에서 `handleQueryChange` 이벤트 핸들러로 이동 |
+| `src/features/map/AppointmentMap.tsx` | 상동 · exhaustive-deps stale ref 경고 | `kakaoUnavailable`을 render-time 파생값으로 변경(state 제거), cleanup에서 markers를 지역 변수로 스냅샷 |
+
+**검증 결과**
+- `npm run lint`: 0 errors, 5 warnings, exit 0 (기존 warning 5개는 유지)
+- `npm run typecheck`: 통과
+- `npm test`: 48/48 통과
+- `npm run test:e2e`: 4/4 통과 (리팩터가 UI 흐름 깨지 않음)
+
+---
+
 _이 문서는 개발 진행에 따라 작업 완료 표시 및 신규 발견 작업을 추가하며 지속 업데이트한다._

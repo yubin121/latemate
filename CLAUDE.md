@@ -64,6 +64,15 @@ npm run test:watch
 # 커버리지 리포트 생성
 npm run test:coverage
 
+# E2E 테스트 (Playwright, chromium)
+npm run test:e2e
+
+# E2E UI 모드 (인터랙티브 디버깅)
+npm run test:e2e:ui
+
+# 마지막 E2E 리포트 열기
+npm run test:e2e:report
+
 # 빌드
 npm run build
 
@@ -92,7 +101,9 @@ npm run lint
 | 장소 검색 | Kakao Local Search API (REST) |
 | 아이콘 | Lucide React (`strokeWidth={1.5}` 통일) |
 | 클래스 유틸 | clsx + tailwind-merge (`cn()` 래퍼) |
-| 테스트 | Vitest + React Testing Library + jsdom (`TZ=Asia/Seoul`) |
+| 테스트 (유닛) | Vitest + React Testing Library + jsdom (`TZ=Asia/Seoul`) |
+| 테스트 (E2E) | Playwright (chromium, 모바일 뷰포트, Kakao·Supabase route mock) |
+| CI | GitHub Actions — push/PR 시 typecheck·lint·유닛·E2E 순차 실행 |
 
 ### 폴더 구조
 
@@ -270,3 +281,5 @@ VITE_KAKAO_REST_API_KEY=    # Kakao REST API 키 (Directions, Local Search)
 | UI/UX 개선 (Phase 9) | ✅ 완료 |
 | 리팩토링 및 최적화 (Phase 10) | ✅ 완료 |
 | 배포 후 개선 (Phase 11) | ✅ 완료 |
+| 테스트 인프라 (T-080 · Vitest+RTL 유닛 48건) | ✅ 완료 |
+| E2E + CI (T-081~T-084 · Playwright · GitHub Actions) | ✅ 완료 |
